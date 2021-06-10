@@ -1,9 +1,10 @@
-defmodule NervesSystemC2.MixProject do
+defmodule NervesSystemC2SD.MixProject do
   use Mix.Project
 
   @github_organization "OffgridElectric"
-  @app :nerves_system_c2
-  @source_url "https://github.com/#{@github_organization}/#{@app}"
+  @app :nerves_system_c2_sd
+  @repo :nerves_system_c2
+  @source_url "https://github.com/#{@github_organization}/#{@repo}"
   @version Path.join(__DIR__, "VERSION")
            |> File.read!()
            |> String.trim()
@@ -42,7 +43,7 @@ defmodule NervesSystemC2.MixProject do
     [
       type: :system,
       artifact_sites: [
-        {:github_releases, "#{@github_organization}/#{@app}"}
+        {:github_releases, "#{@github_organization}/#{@repo}"}
       ],
       build_runner_opts: build_runner_opts(),
       platform: Nerves.System.BR,
