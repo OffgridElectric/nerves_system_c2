@@ -2,9 +2,17 @@
 
 Describes changes between upstream `nerves_system_bbb` and `nerves_system_c2`.
 
-## v2.15.1+zola-5
+## v2.15.1+zola-1
+
+* Update fwup.conf for FAT resources delta update
+
+## v2.15.1+zola-6
 
 * Use fwup next (1.10.1-pre) for testing full delta updates
+
+## v2.15.1+zola-5
+
+* ~~Use fwup next (1.10.1-pre) for testing full delta updates~~
 
 ## v2.15.1+zola-4
 
