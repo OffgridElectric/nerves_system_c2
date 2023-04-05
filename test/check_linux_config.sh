@@ -7,6 +7,8 @@ requires=( \
   "CONFIG_VFAT_FS=y" \
   "CONFIG_DEVTMPFS=y" \
   "CONFIG_DEVTMPFS_MOUNT=y" \
+  "CONFIG_SQUASHFS=y" \
+  "CONFIG_TI_CPSW=y" \
   )
 
 usage() {
