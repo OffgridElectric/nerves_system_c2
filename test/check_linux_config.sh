@@ -9,6 +9,9 @@ requires=( \
   "CONFIG_DEVTMPFS_MOUNT=y" \
   "CONFIG_SQUASHFS=y" \
   "CONFIG_TI_CPSW=y" \
+  "CONFIG_USB_SERIAL=m" \
+  "CONFIG_USB_SERIAL_OPTION=m" \
+  "CONFIG_USB_NET_QMI_WWAN=m" \
   )
 
 usage() {

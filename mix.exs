@@ -18,7 +18,10 @@ defmodule NervesSystemC2.MixProject do
       description: description(),
       package: package(),
       deps: deps(),
-      aliases: [loadconfig: [&bootstrap/1]],
+      aliases: [
+        test: [&test/1],
+        loadconfig: [&bootstrap/1]
+      ],
       docs: docs(),
       preferred_cli_env: %{
         docs: :docs,
@@ -30,6 +33,16 @@ defmodule NervesSystemC2.MixProject do
 
   def application do
     []
+  end
+
+  defp test(_args) do
+    ret = Mix.shell().cmd("test/check_linux_config.sh linux/linux-4.19.defconfig")
+
+    if ret == 0 do
+      Mix.shell().info("OK")
+    else
+      Mix.shell().error("FAIL")
+    end
   end
 
   defp bootstrap(args) do
