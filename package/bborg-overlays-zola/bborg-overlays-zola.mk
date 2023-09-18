@@ -4,7 +4,7 @@
 #
 #############################################################
 
-BBORG_OVERLAYS_ZOLA_VERSION = 00d980344885ef8090774fee4a7cbfb0076af21b
+BBORG_OVERLAYS_ZOLA_VERSION = 69a96c9fa270550f860c9d82adb153d89abdcd68
 BBORG_OVERLAYS_ZOLA_SITE = $(call github,OffgridElectric,bb.org-overlays,$(BBORG_OVERLAYS_ZOLA_VERSION))
 BBORG_OVERLAYS_ZOLA_LICENSE = GPLv2
 BBORG_OVERLAYS_ZOLA_DEPENDENCIES = host-dtc
