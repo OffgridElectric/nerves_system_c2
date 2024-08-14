@@ -11,7 +11,7 @@ update_kernel_patch() {
   local OUTPUT_PATCH=$3
 
   local ORIGINAL_DIFF=patch-$PATCH_VERSION.diff
-  local ORIGINAL_DIFF_XZ=$ORIGINAL_DIFF.xz
+  local ORIGINAL_DIFF_XZ=$ORIGINAL_DIFF.gz
   local KERNEL_TARBALL=linux-$KERNEL_VERSION.tar.xz
 
   # Work in a temporary directory
@@ -21,22 +21,8 @@ update_kernel_patch() {
 
   echo "Downloading files..."
 
-  local RCN_PATCH_URL
-  local KERNEL_URL
-
-  case $KERNEL_VERSION in
-      5*)
-          RCN_PATCH_URL=http://rcn-ee.net/deb/bookworm-armhf/v$PATCH_VERSION/$ORIGINAL_DIFF_XZ
-          KERNEL_URL=https://www.kernel.org/pub/linux/kernel/v5.x/$KERNEL_TARBALL
-          ;;
-      4*)
-          RCN_PATCH_URL=http://rcn-ee.net/deb/bullseye-armhf/v$PATCH_VERSION/$ORIGINAL_DIFF_XZ
-          KERNEL_URL=https://www.kernel.org/pub/linux/kernel/v4.x/$KERNEL_TARBALL
-          ;;
-      *)
-          echo "Unexpected kernel version: $KERNEL_VERSION"
-          exit 1
-  esac
+  RCN_PATCH_URL=http://rcn-ee.net/deb/sid-armhf/v$PATCH_VERSION/$ORIGINAL_DIFF_XZ
+  KERNEL_URL=https://www.kernel.org/pub/linux/kernel/v6.x/$KERNEL_TARBALL
 
   # Download the master patch file for the RCN kernel
   wget $RCN_PATCH_URL
@@ -50,7 +36,7 @@ update_kernel_patch() {
   tar -x -f $KERNEL_TARBALL && mv linux-$KERNEL_VERSION b
 
   # Expand the "git" style patch
-  unxz $ORIGINAL_DIFF_XZ
+  gunzip $ORIGINAL_DIFF_XZ
 
   # Make a git repo and apply the "git" style patch
   echo "Creating temporary git repo to extract RCN patch..."
@@ -74,8 +60,6 @@ update_kernel_patch() {
   return 0
 }
 
-#update_kernel_patch 4.19.120-bone50 4.19.120 0001-rcn-linux-4.19.120-bone50.patch
-#update_kernel_patch 5.4.115-bone52 5.4.115 0001-rcn-linux-5.4.115-bone52.patch
-update_kernel_patch 5.10.120-ti-r46 5.10.120 0001-rcn-linux-5.10.120-ti-r46.patch
+update_kernel_patch 6.6.32-ti-arm32-r6 6.6.32 0001-rcn-linux-6.6.32-ti-arm32-r6.patch
 
 echo "Updated patches. Now rebuild the linux kernel."
