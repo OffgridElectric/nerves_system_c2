@@ -12,6 +12,215 @@ follows:
    releases, and Linux kernel updates. They're also made to fix bugs and add
    features to the build infrastructure.
 
+## v2.22.1
+
+This is a security/bug fix update.
+
+* Changes
+  * Enable the `wpa_supplicant` option for allow wired 802.1x authentication
+
+* Package updates
+  * [Erlang/OTP 26.2.5](https://erlang.org/download/OTP-26.2.5.README)
+  * [Buildroot 2024.02.1](https://lore.kernel.org/buildroot/87jzlp9u5e.fsf@48ers.dk/T/)
+
+## v2.22.0
+
+This is a major Buildroot update.
+
+Please see the [nerves_system_br v1.27.0 release notes](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.26.0)
+for upgrade instructions if you've forked this system.
+
+* Updated dependencies
+  * Linux 6.6.15-ti-arm32-r1
+  * [nerves_system_br v1.27.0](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.27.0)
+  * [Buildroot 2024.02](https://lore.kernel.org/buildroot/87msrczp4z.fsf@48ers.dk/)
+  * [Erlang/OTP 26.2.3](https://erlang.org/download/OTP-26.2.3.README)
+
+## v2.21.0
+
+This is a major Buildroot and Linux update. If you use `circuits_gpio`, it is
+critical to update to 1.2.0 or later to get a workaround for GPIO indices
+changing.
+
+Please see the [nerves_system_br v1.26.0 release notes](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.26.0)
+for upgrade instructions if you've forked this system.
+
+* Updated dependencies
+  * linux 6.1.69-ti-r21
+  * [Erlang/OTP 26.2.2](https://erlang.org/download/OTP-26.2.2.README)
+  * [nerves_system_br v1.26.1](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.26.1)
+  * [Buildroot 2023.11.1](https://lore.kernel.org/buildroot/87cyu2k2gu.fsf@48ers.dk/T/)
+
+## v2.20.2
+
+This is a security/bug fix update.
+
+*  Package updates
+  * [Erlang/OTP 26.2.1](https://erlang.org/download/OTP-26.2.1.README)
+  * [nerves_heart 2.3.0](https://github.com/nerves-project/nerves_heart/releases/tag/v2.3.0)
+
+## v2.20.1
+
+This fixes a regression where the forced `circuits_gpio` dependency update broke
+compilation. This removes the optional dependency, but be sure to see the note
+below about the GPIOs being remapped and Circuits.GPIO v1.2.0 containing a
+workaround.
+
+## v2.20.0
+
+This is a major Buildroot, toolchain, and Linux kernel update.
+
+Please see [nerves_system_br v1.25.0 release notes](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.25.0)
+for upgrade instructions if you've forked this system.
+
+The Linux kernel update from 5.10 to 6.1 has a side effect of renumbering GPIOs.
+Circuits.GPIO v1.2 accounts for this so programs don't need to change that use
+it. See https://github.com/elixir-circuits/circuits_gpio/pull/153 for more
+information. This system has an optional dependency on Circuits.GPIO to force
+the upgrade.
+
+* Updated dependencies
+  * Linux 6.1.46-ti-r13
+  * [nerves_system_br v1.25.2](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.25.2)
+  * [Buildroot 2023.08.4](https://lore.kernel.org/buildroot/87o7f6t7fs.fsf@48ers.dk/T/)
+  * [Erlang/OTP 26.1.2](https://erlang.org/download/OTP-26.1.2.README)
+
+## v2.19.1
+
+This is a security/bug fix update.
+
+* Package updates
+  * [nerves_system_br v1.24.1](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.24.1)
+  * [Erlang/OTP 26.1.1](https://erlang.org/download/OTP-26.1.1.README)
+  * [Buildroot 2023.05.3](https://lore.kernel.org/buildroot/87h6ngup34.fsf@48ers.dk/T/)
+
+## v2.19.0
+
+This is a Buildroot version update that appears to mostly contain bug and
+security fixes. It should be a low risk upgrade from v2.18.2.
+
+* New features
+  * Support factory reset, preventing firmware reverts. See [Nerves.Runtime.FwupOps](https://hexdocs.pm/nerves_runtime/Nerves.Runtime.FwupOps.html)
+
+* Updated dependencies
+  * [nerves_system_br v1.24.0](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.24.0)
+  * [Buildroot 2023.05.2](https://lore.kernel.org/buildroot/87ledrkrpp.fsf@48ers.dk/T/), [2023.05.1](https://lore.kernel.org/buildroot/87351m8qm4.fsf@48ers.dk/T/), [2023.05](https://lore.kernel.org/buildroot/87r0qn2c77.fsf@48ers.dk/T/)
+  * [Erlang/OTP 26.1](https://erlang.org/download/OTP-26.1.README)
+
+## v2.18.2
+
+* Updated dependencies
+  * [nerves_system_br v1.23.3](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.23.3)
+
+## v2.18.1
+
+This is a bug and security fix update. It should be a low risk upgrade.
+
+* Fixes
+  * Fix CTRL+R over ssh
+
+* Updated dependencies
+  * [nerves_system_br v1.23.2](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.23.2)
+  * [Buildroot 2023.02.2](https://lore.kernel.org/buildroot/87y1je6wva.fsf@48ers.dk/T/)
+
+## v2.18.0
+
+This is a major update that brings in Erlang/OTP 26, Buildroot 2023.02.2 and
+Linux 5.10.162.
+
+* New features
+  * CA certificates are included for OTP 26.
+
+* Updated dependencies
+  * [nerves_system_br v1.23.1](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.23.1)
+  * [Buildroot 2023.02.2](https://lore.kernel.org/buildroot/87wn03ifbl.fsf@48ers.dk/T/)
+  * [Erlang/OTP 26.0.2](https://erlang.org/download/OTP-26.0.2.README)
+  * Linux 5.10.162
+
+## v2.17.2
+
+This is a bug and security fix update. It should be a low risk upgrade.
+
+* Updated dependencies
+  * [nerves_system_br v1.22.5](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.22.5)
+  * [Buildroot 2022.11.3](https://lore.kernel.org/buildroot/878rfuxbxx.fsf@dell.be.48ers.dk/T/)
+
+## v2.17.1
+
+This is a bug fix and Erlang version bump from 25.2 to 25.2.3. It should be a
+low risk upgrade.
+
+* Fixes
+  * Set Erlang crash dump timer to 5 seconds, so if an Erlang crash dump does
+    happen, it will run for at most 5 seconds. See erlinit.conf.
+
+* Updated dependencies
+  * [nerves_system_br v1.22.3](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.22.3)
+  * [Buildroot 2022.11.1](https://lore.kernel.org/buildroot/87ilh4dvax.fsf@dell.be.48ers.dk/T/#u)
+
+## v2.17.0
+
+This is a Buildroot version update that appears to mostly contain bug and
+security fixes. It should be a low risk upgrade.
+
+* Updated dependencies
+  * [nerves_system_br v1.22.1](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.22.1)
+  * [Buildroot 2022.11](http://lists.busybox.net/pipermail/buildroot/2022-December/656980.html)
+  * GCC 12.2
+
+## v2.16.2
+
+* Changes
+  * Two Buildroot patch updates and an Erlang minor version update
+  * Nerves Heart v2.0 is now included. Nerves Heart connects the Erlang runtime
+    to a hardware watchdog. v2.0 has numerous updates to improve information
+    that you can get and also has more safeguards to avoid conditions that could
+    cause a device to hang forever.
+
+* Updated dependencies
+  * [nerves_system_br v1.21.6](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.21.6)
+  * [Erlang/OTP 25.2](https://erlang.org/download/OTP-25.2.README)
+  * [Buildroot 2022.08.3](https://lore.kernel.org/buildroot/87r0x7z5cw.fsf@dell.be.48ers.dk/T/#u)
+  * [nerves_heart v2.0.2](https://github.com/nerves-project/nerves_heart/releases/tag/v2.0.2)
+
+## v2.16.1
+
+* Changes
+  * Reduce first-time Linux kernel download by using tarball source
+
+* Updated dependencies
+  * [nerves_system_br v1.21.2](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.21.2)
+  * [Erlang/OTP 25.1.2](https://erlang.org/download/OTP-25.1.2.README)
+
+## v2.16.0
+
+* Changes
+  * Support aarch64 Linux builds
+  * Add libdtc to support runtime loading of device tree overlays
+
+* Updated dependencies
+  * [nerves_system_br v1.21.1](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.21.1)
+    and also see [nerves_system_br v1.21.0](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.21.0)
+  * [Buildroot 2022.08.1](http://lists.busybox.net/pipermail/buildroot/2022-October/652816.html)
+  * [Erlang/OTP 25.1.1](https://erlang.org/download/OTP-25.1.1.README)
+
+## v2.15.3
+
+* Fixes
+  * Allow kernel includes for device tree overlays (Thanks @insasec)
+
+* Updated dependencies
+  * [nerves_system_br v1.20.6](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.20.6)
+  * [Erlang/OTP 25.0.4](https://erlang.org/download/OTP-25.0.4.README)
+  * [Buildroot 2022.05.2](http://lists.busybox.net/pipermail/buildroot/2022-August/650546.html)
+  * Also see [Buildroot 2022.05.1 changes](http://lists.busybox.net/pipermail/buildroot/2022-July/647814.html)
+
+## v2.15.2
+
+* Updated dependencies
+  * [nerves_system_br v1.20.4](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.20.4)
+  * [Erlang/OTP 25.0.3](https://erlang.org/download/OTP-25.0.3.README)
+
 ## v2.15.1
 
 This release reverts the upgrade to Linux 5.15.44. The Linux kernel is now at
