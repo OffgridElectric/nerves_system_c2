@@ -3,7 +3,7 @@ defmodule TestC2.MixProject do
 
   @app :test_c2
   @version "0.1.0"
-  @all_targets [:bbb]
+  @all_targets [:bbb, :c2]
 
   def project do
     [
@@ -47,7 +47,8 @@ defmodule TestC2.MixProject do
       # bumps to Nerves systems. Since these include Linux kernel and Erlang
       # version updates, please review their release notes in case
       # changes to your application are needed.
-      {:nerves_system_bbb, "~> 2.19", runtime: false, targets: :bbb}
+      {:nerves_system_bbb, "~> 2.19", runtime: false, targets: :bbb},
+      {:nerves_system_c2, path: "../", runtime: false, nerves: [compile: true], targets: :c2},
     ]
   end
 
