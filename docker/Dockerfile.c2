@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev libssh-dev unixodbc-dev \
     udev gcc g++ ssh locales \
     wget gnupg ca-certificates \
-    libreadline-dev pkg-config nano squashfs-tools file\
+    libreadline-dev pkg-config nano squashfs-tools file cpio rsync bc\
     && apt-get clean
 
 # Set locale

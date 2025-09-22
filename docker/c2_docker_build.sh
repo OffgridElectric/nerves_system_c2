@@ -1,1 +1,1 @@
-docker build -t "aloha_dev" -f ./docker/Dockerfile.aloha ./docker
+docker build -t "c2_dev" -f ./docker/Dockerfile.aloha ./docker

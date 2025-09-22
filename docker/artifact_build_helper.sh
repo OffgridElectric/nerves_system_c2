@@ -6,6 +6,7 @@ set_artifact_env()
 
 build()
 {
+    set_artifact_env
     WS=/work/nerves_system_c2
     cd $WS ; mix deps.get
     cd $WS/test_c2 ; mix deps.get
