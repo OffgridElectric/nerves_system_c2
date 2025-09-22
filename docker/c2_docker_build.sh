@@ -1,0 +1,1 @@
+docker build -t "aloha_dev" -f ./docker/Dockerfile.aloha ./docker
