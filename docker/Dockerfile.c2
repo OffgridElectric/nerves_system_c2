@@ -1,10 +1,10 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV LANG=C.UTF-8
-ENV ASDF_DIR=/opt/asdf
 
-# Install required packages
+#ENV ASDF_DIR=/opt/asdf
+
+
 RUN apt-get update && apt-get install -y \
     curl git unzip zip build-essential \
     libssl-dev libncurses-dev m4 cmake \
@@ -16,16 +16,38 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Set locale
+ENV LANG=C.UTF-8
 RUN locale-gen en_US.UTF-8
-ENV LANG en_US.UTF-8
 
-# Install ASDF
-RUN git clone https://github.com/asdf-vm/asdf.git $ASDF_DIR --branch v0.14.0
-ENV PATH="$ASDF_DIR/bin:$ASDF_DIR/shims:$PATH"
+    # Install fwup 1.10.1
+RUN wget https://github.com/fwup-home/fwup/releases/download/v1.10.1/fwup_1.10.1_amd64.deb && \
+    dpkg -i fwup_1.10.1_amd64.deb || apt-get install -f -y && \
+    rm fwup_1.10.1_amd64.deb
+
+ARG USERNAME=dev
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN groupadd --gid $USER_GID $USERNAME \
+  && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+  && chsh -s /bin/bash $USERNAME
+
+USER $USERNAME
+WORKDIR /home/$USERNAME
+ENV HOME=/home/$USERNAME
+
+
+ENV LANG en_US.UTF-8
 
 # Add ASDF plugins and install Erlang/Elixir
 ARG ERLANG_VERSION=27.3.4.2
 ARG ELIXIR_VERSION=1.17.3-otp-27
+
+ENV ASDF_DIR=$HOME/.asdf
+# Install ASDF
+RUN git clone https://github.com/asdf-vm/asdf.git $ASDF_DIR --branch v0.14.0
+ENV PATH="$ASDF_DIR/bin:$ASDF_DIR/shims:$PATH"
+
 
 RUN bash -c ". $ASDF_DIR/asdf.sh && \
     asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git && \
@@ -37,24 +59,14 @@ RUN bash -c ". $ASDF_DIR/asdf.sh && \
     asdf install elixir $ELIXIR_VERSION && \
     asdf global elixir $ELIXIR_VERSION"
 
-# Install fwup 1.10.1
-RUN wget https://github.com/fwup-home/fwup/releases/download/v1.10.1/fwup_1.10.1_amd64.deb && \
-    dpkg -i fwup_1.10.1_amd64.deb || apt-get install -f -y && \
-    rm fwup_1.10.1_amd64.deb
-
-
 # Setup shell init for asdf
-RUN echo ". $ASDF_DIR/asdf.sh" >> /etc/profile
+RUN echo ". $ASDF_DIR/asdf.sh" >> ~/.bashrc
 
 # Install Hex, Rebar, and Nerves Bootstrap
 RUN bash -c ". $ASDF_DIR/asdf.sh && \
     mix local.hex --force && \
     mix local.rebar --force && \
     mix archive.install hex nerves_bootstrap --force"
-
-RUN echo '\n. /opt/asdf/asdf.sh' >> /etc/bash.bashrc
-# Set working directory
-WORKDIR /work
 
 # Default command
 CMD ["/bin/bash"]
