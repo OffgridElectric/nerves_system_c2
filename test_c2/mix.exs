@@ -40,6 +40,7 @@ defmodule TestC2.MixProject do
       {:nerves_runtime, "~> 0.13.0"},
       {:nerves_runtime_shell, "~> 0.1.0"},
       {:circuits_uart, "~> 1.5"},
+      {:circuits_gpio, "~> 1.0"},
          # Project-specific/internal
       {:zola_ca, git: "git@github.com:OffgridElectric/zola_ca.git"},
       {:nerves_test_client, git: "git@github.com:OffgridElectric/nerves_test_client.git"},
