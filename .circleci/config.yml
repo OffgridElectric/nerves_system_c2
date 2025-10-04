@@ -33,7 +33,7 @@ workflows:
           filters:
             branches:
               only:
-                -vj/c2-artifact-test   # ✅ runs only for this branch
+                - vj/c2-artifact-test   # runs only for this branch
             tags:
               ignore: /.*/                   # ignore tags
 
