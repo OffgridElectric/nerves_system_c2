@@ -18,7 +18,7 @@ build() {
     set_artifact_env
 
     # Determine workspace from current folder
-    WS=$(pwd)
+    WS=/work/nerves_system_c2
     echo "Workspace set to $WS"
 
     # Ensure artifacts folder exists
