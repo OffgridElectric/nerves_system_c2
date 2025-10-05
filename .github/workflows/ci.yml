@@ -1,6 +1,15 @@
 name: CI
 
-on: [push]
+#on: [push]
+
+on:
+  push:
+    branches-ignore:
+      - vj/c2-artifact-test
+  pull_request:
+    branches-ignore:
+      - vj/c2-artifact-test
+
 
 env:
   OTP_VERSION: 27.3.4.2
