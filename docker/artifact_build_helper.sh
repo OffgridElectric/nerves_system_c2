@@ -17,6 +17,10 @@ set_artifact_env() {
 build() {
     set_artifact_env
 
+    # initialize asdf
+    . /home/dev/.asdf/asdf.sh
+    . /home/dev/.asdf/completions/asdf.bash
+
     # Determine workspace from current folder
     WS=/work/nerves_system_c2
     echo "Workspace set to $WS"
