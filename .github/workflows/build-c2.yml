@@ -23,13 +23,7 @@ jobs:
           chmod +x ./docker/c2_docker_build.sh
           ./docker/c2_docker_build.sh
 
-      # Step 3: Fix asdf and bash profile permissions (needed for CI)
-      - name: Fix asdf permissions
-        run: |
-          sudo chmod -R a+rX /home/dev/.asdf || true
-          sudo chmod 644 /home/dev/.bash_profile || true
-
-      # Step 4: Run build inside container using your shell script
+      # Step 3: Run build inside container using your shell script
       - name: Run firmware build inside Docker container
         run: |
           chmod +x ./docker/c2_docker_shell.sh
