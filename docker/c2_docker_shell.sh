@@ -6,4 +6,5 @@ docker run --rm \
   -v ~/.ssh:/home/dev/.ssh:ro \
   -u $(id -u):$(id -g) \
   c2_dev \
-  bash -c "$1"
+  bash -lc "$1"
+
