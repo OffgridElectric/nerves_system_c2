@@ -3,7 +3,7 @@ name: Build Nerves C2 Firmware
 on:
   push:
     branches:
-      - vj/c2-artifact-test   # only runs for this branch
+      - vj/c2-artifact-test
   pull_request:
     branches:
       - vj/c2-artifact-test
@@ -17,11 +17,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Build the C2 Docker image
+      # Step 2: Build the C2 Docker image with matching UID/GID
       - name: Build C2 Docker image
         run: |
-          chmod +x ./docker/c2_docker_build.sh
-          ./docker/c2_docker_build.sh
+          export CI_UID=$(id -u)
+          export CI_GID=$(id -g)
+          docker build \
+            --build-arg USER_UID=${CI_UID} \
+            --build-arg USER_GID=${CI_GID} \
+            -t c2_dev \
+            -f docker/Dockerfile.c2 \
+            docker
 
       # Step 3: Run build inside container using your shell script
       - name: Run firmware build inside Docker container
