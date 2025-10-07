@@ -17,9 +17,23 @@ set_artifact_env() {
 build() {
     set_artifact_env
 
+
+    #check if asdf.sh is readable
+    if [ -r /home/dev/.asdf/asdf.sh ]; then
+        . /home/dev/.asdf/asdf.sh
+    else
+        echo "ERROR: /home/dev/.asdf/asdf.sh is not readable"
+        ls -l /home/dev/.asdf/asdf.sh
+        exit 1
+    fi
+
+    if [ -r /home/dev/.asdf/completions/asdf.bash ]; then
+        . /home/dev/.asdf/completions/asdf.bash
+    fi
+
     # initialize asdf
-    . /home/dev/.asdf/asdf.sh
-    . /home/dev/.asdf/completions/asdf.bash
+    #. /home/dev/.asdf/asdf.sh
+    #. /home/dev/.asdf/completions/asdf.bash
 
     # Determine workspace from current folder
     WS=/work/nerves_system_c2

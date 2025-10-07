@@ -64,13 +64,17 @@ RUN bash -c ". $ASDF_DIR/asdf.sh && \
 RUN echo ". $ASDF_DIR/asdf.sh" >> /home/$USERNAME/.bashrc && \
     echo ". $ASDF_DIR/asdf.sh" >> /home/$USERNAME/.bash_profile
 
-# Fix permissions so non-login, non-interactive shells can use asdf
-RUN chmod -R a+rX $HOME/.asdf \
-    && chmod 644 $HOME/.bash_profile \
-    && chmod 644 $HOME/.bashrc
+# Fix shell dotfile permissions and ownership explicitly
+USER root
+RUN chown $USERNAME:$USERNAME /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc && \
+    chmod 644 /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc
 
+# Make sure asdf directory is fully readable/executable
+RUN chown -R $USERNAME:$USERNAME $ASDF_DIR && chmod -R a+rX $ASDF_DIR
 
-# Install Hex, Rebar, and Nerves Bootstrap
+USER $USERNAME
+
+# Install Hex, Rebar, and Nerves Bootstrap as $USERNAME
 RUN bash -c ". $ASDF_DIR/asdf.sh && \
     mix local.hex --force && \
     mix local.rebar --force && \
