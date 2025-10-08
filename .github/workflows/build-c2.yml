@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - vj/c2-artifact-test
+  workflow_dispatch:
 
 jobs:
   build-nerves-c2:
