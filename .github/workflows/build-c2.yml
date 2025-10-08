@@ -46,6 +46,14 @@ jobs:
             -f docker/Dockerfile.c2 \
             docker
 
+      - name: DEBUG – show actor & real token prefix
+        run: |
+          echo "Actor        : ${{ github.actor }}"
+          echo "Token prefix : ${CI_GITHUB_TOKEN:0:6}"
+          echo "Token length : ${#CI_GITHUB_TOKEN}"
+        env:
+          CI_GITHUB_USER: ${{ github.actor }}
+          CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
       - name: DEBUG – check token and insteadOf
         run: |
