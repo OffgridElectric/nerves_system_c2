@@ -42,8 +42,8 @@ defmodule TestC2.MixProject do
       {:circuits_uart, "~> 1.5"},
       {:circuits_gpio, "~> 1.0"},
          # Project-specific/internal
-      #{:zola_ca, git: "git@github.com:OffgridElectric/zola_ca.git"},
-      #{:nerves_test_client, git: "git@github.com:OffgridElectric/nerves_test_client.git"},
+      {:zola_ca, git: "git@github.com:OffgridElectric/zola_ca.git"},
+      {:nerves_test_client, git: "git@github.com:OffgridElectric/nerves_test_client.git"},
       {:nerves_key, "~> 1.1", targets: @all_targets},
 
       # Dependencies for all targets except :host
