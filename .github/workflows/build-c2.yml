@@ -3,10 +3,10 @@ name: Build Nerves C2 Firmware
 on:
   push:
     branches:
-      - develop
+      - vj/c2-artifact-test
   pull_request:
     branches:
-      - develop
+      - vj/c2-artifact-test
 
 jobs:
   build-nerves-c2:
@@ -17,13 +17,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2
-      - name: Ensure CI SSH key exists
+      # Step 2: Set up git to use token
+      - name: Setup GitHub token for private repository access
+        env:
+          CI_GITHUB_USER: ${{ secrets.GITHUB_USER }}
+          CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         run: |
-          mkdir -p ~/.ssh
-          if [ -z "$(ls ~/.ssh/*.pub 2>/dev/null)" ]; then
-            ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
-          fi
+          git config --global url."https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
 
       # Step 3: Build the C2 Docker image with matching UID/GID
       - name: Build C2 Docker image
