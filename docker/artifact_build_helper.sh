@@ -9,6 +9,9 @@ set_artifact_env() {
     export MIX_TARGET=c2
     export MIX_ENV=prod
     echo "Environment set: MIX_TARGET=$MIX_TARGET, MIX_ENV=$MIX_ENV"
+    export CI_GITHUB_USER="${CI_GITHUB_USER}"
+    export CI_GITHUB_TOKEN="${CI_GITHUB_TOKEN}"
+    git config --global url."https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
 }
 
 # -----------------------------
