@@ -13,7 +13,7 @@ jobs:
   build-nerves-c2:
     runs-on: ubuntu-latest
     env:
-      CI_GITHUB_USER: ${{ github.actor }}
+      CI_GITHUB_USER: vmanchala-dev
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     steps:
@@ -46,28 +46,31 @@ jobs:
             -f docker/Dockerfile.c2 \
             docker
 
+
       - name: DEBUG – check token and insteadOf
         run: |
           docker run --rm -e CI_GITHUB_USER -e CI_GITHUB_TOKEN \
             c2_dev \
-            bash -c "
+            bash -c '
               set -x
-              git config --list | grep insteadOf
-              echo 'Token length: ${#CI_GITHUB_TOKEN}'
-              echo 'Try real clone:'
+              git config --list | grep insteadOf || true
+              export GIT_CURL_VERBOSE=1
+              echo "Token length: ${#CI_GITHUB_TOKEN}"
+              echo "Try real clone:"
               git clone https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/OffgridElectric/zola_ca.git /tmp/z 2>&1 || true
-            "
-      # Step 4: Run build inside container using your shell script
+            '
+
+      # ------------------------------------------------------------------
+      # Build firmware inside container
+      # ------------------------------------------------------------------
       - name: Run firmware build inside Docker container
         env:
-          CI_GITHUB_USER: ${{ secrets.CI_GITHUB_USER }}
+          CI_GITHUB_USER: ${{ github.actor }}          # or secrets.CI_GITHUB_USER
           CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         run: |
           chmod +x ./docker/c2_docker_shell.sh
-          # ---- export so the shell can expand them ----
-          export CI_GITHUB_USER CI_GITHUB_TOKEN
-           # ---------------------------------------------
-          ./docker/c2_docker_shell.sh "source /work/nerves_system_c2/docker/artifact_build_helper.sh && build"
+          ./docker/c2_docker_shell.sh \
+            "source /work/nerves_system_c2/docker/artifact_build_helper.sh && build"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
