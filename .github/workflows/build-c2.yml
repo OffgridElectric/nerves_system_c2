@@ -46,6 +46,17 @@ jobs:
             -f docker/Dockerfile.c2 \
             docker
 
+      - name: DEBUG – check token and insteadOf
+        run: |
+          docker run --rm -e CI_GITHUB_USER -e CI_GITHUB_TOKEN \
+          c2_dev \
+          bash -c '
+          set -x
+          git config --list | grep insteadOf
+          echo "Token length: ${#CI_GITHUB_TOKEN}"
+          echo "Try real clone:"
+         git clone https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/OffgridElectric/zola_ca.git /tmp/z 2>&1 || true'
+
       # Step 4: Run build inside container using your shell script
       - name: Run firmware build inside Docker container
         env:
