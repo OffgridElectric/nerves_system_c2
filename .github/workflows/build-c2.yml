@@ -48,7 +48,7 @@ jobs:
 
       - name: DEBUG – show actor & real token prefix
         run: |
-          echo "Actor        : ${{ github.actor }}"
+          echo "Actor(username) : ${{ github.actor }}"
           echo "Token prefix : ${CI_GITHUB_TOKEN:0:6}"
           echo "Token length : ${#CI_GITHUB_TOKEN}"
         env:
