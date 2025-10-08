@@ -12,6 +12,9 @@ on:
 jobs:
   build-nerves-c2:
     runs-on: ubuntu-latest
+    env:
+      CI_GITHUB_USER: ${{ secrets.CI_GITHUB_USER }}
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     steps:
       # Step 1: Checkout your repo
@@ -23,18 +26,15 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           if [ -z "$(ls ~/.ssh/*.pub 2>/dev/null)" ]; then
-          ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
+            ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
           fi
 
-      # Step 3: Set up git to use token
-      - name: Setup GitHub token for private repository access
-        env:
-          CI_GITHUB_USER: ${{ secrets.CI_GITHUB_USER }}
-          CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+      - name: Debug environment
         run: |
-          echo "Environment variables set, continuing..." 
+          echo "GITHUB USER: $CI_GITHUB_USER"
+          echo "GITHUB TOKEN length: ${#CI_GITHUB_TOKEN}"
 
-      # Step 4: Build the C2 Docker image with matching UID/GID
+      # Step 3: Build the C2 Docker image with matching UID/GID
       - name: Build C2 Docker image
         run: |
           export CI_UID=$(id -u)
@@ -46,13 +46,15 @@ jobs:
             -f docker/Dockerfile.c2 \
             docker
 
-      # Step 5: Run build inside container using your shell script
+      # Step 4: Run build inside container using your shell script
       - name: Run firmware build inside Docker container
         run: |
           chmod +x ./docker/c2_docker_shell.sh
           ./docker/c2_docker_shell.sh "source /work/nerves_system_c2/docker/artifact_build_helper.sh && build"
-      
-      # Step 6: upload the artifatcs
+        env:
+          CI_GITHUB_USER: ${{ secrets.CI_GITHUB_USER }}
+          CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
