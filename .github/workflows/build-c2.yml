@@ -29,11 +29,6 @@ jobs:
             ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519
           fi
 
-      - name: Debug environment
-        run: |
-          echo "GITHUB USER: $CI_GITHUB_USER"
-          echo "GITHUB TOKEN length: ${#CI_GITHUB_TOKEN}"
-
       # Step 3: Build the C2 Docker image with matching UID/GID
       - name: Build C2 Docker image
         run: |
@@ -55,20 +50,7 @@ jobs:
           CI_GITHUB_USER: ${{ github.actor }}
           CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
-      - name: DEBUG – check token and insteadOf
-        run: |
-          docker run --rm -e CI_GITHUB_USER -e CI_GITHUB_TOKEN \
-            c2_dev \
-            bash -c '
-              set -x
-              git config --list | grep insteadOf || true
-              export GIT_CURL_VERBOSE=1
-              echo "Token length: ${#CI_GITHUB_TOKEN}"
-              echo "Try real clone:"
-              git clone https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/OffgridElectric/zola_ca.git /tmp/z 2>&1 || true
-            '
-
-      # ------------------------------------------------------------------
+            # ------------------------------------------------------------------
       # Build firmware inside container
       # ------------------------------------------------------------------
       - name: Run firmware build inside Docker container
