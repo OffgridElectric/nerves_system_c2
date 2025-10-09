@@ -42,11 +42,7 @@ jobs:
             docker
 
       # Build firmware inside container
-      # ------------------------------------------------------------------
       - name: Run firmware build inside Docker container
-        env:
-          CI_GITHUB_USER: ${{ github.actor }}
-          CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         run: |
           chmod +x ./docker/c2_docker_shell.sh
           ./docker/c2_docker_shell.sh \
