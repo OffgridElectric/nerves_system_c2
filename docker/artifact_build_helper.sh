@@ -46,7 +46,7 @@ build() {
     echo "==> Cleaning & rebuilding nerves_system_c2"
     export NERVES_SYSTEM_CACHE=none        # ignore any cached system
     cd "$WS"
-    mix deps.clean        # remove pre-built files
+    mix deps.clean -all      # remove pre-built files
 
     # -------------------------
     # Install dependencies
