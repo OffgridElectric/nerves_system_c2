@@ -13,7 +13,7 @@ jobs:
   build-nerves-c2:
     runs-on: ubuntu-latest
     env:
-      CI_GITHUB_USER: vmanchala-dev
+      CI_GITHUB_USER: ${{ github.actor }}
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     steps:
