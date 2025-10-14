@@ -42,26 +42,6 @@ build() {
     # Ensure artifacts folder exists
     mkdir -p "$WS/artifacts"
 
-    VERSION=$(cat "$WS/VERSION" | tr -d '[:space:]')
-    ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
-                   -name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
-                   | sort | tail -n 1)
-
-    if [ ! -f "$ARTIFACT_TARBALL" ]; then
-        echo "==> Artefact missing – building Buildroot/Linux system"
-        export NERVES_SYSTEM_CACHE=none
-
-        "$WS/deps/nerves_system_br/create-build.sh" \
-            "$WS/nerves_defconfig" \
-            "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}" \
-            >/dev/null
-
-        cd "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}"
-        make -j"$(nproc)"
-        cd "$WS"
-    else
-        echo "==> Artefact already exists – skipping system build"
-    fi
 
     # ------------------------------------------------------------------
     # 2.  Install deps & build firmware
@@ -74,10 +54,34 @@ build() {
     cd $WS/test_c2
     mix deps.get
 
+
+    VERSION=$(cat "$WS/VERSION" | tr -d '[:space:]')
+    ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
+	-name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
+	| sort | tail -n 1)
+
+    if [ ! -f "$ARTIFACT_TARBALL" ]; then
+	echo "==> Artefact missing – building Buildroot/Linux system"
+	export NERVES_SYSTEM_CACHE=none
+
+	"$WS/deps/nerves_system_br/create-build.sh" \
+		"$WS/nerves_defconfig" \
+		"$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}" \
+		>/dev/null
+
+	cd "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}"
+	make -j"$(nproc)"
+	cd "$WS"
+    else
+	echo "==> Artefact already exists – skipping system build"
+    fi
+
+
     # -------------------------
     # Build firmware
     # -------------------------
     echo "==> Building firmware"
+    cd $WS/test_c2
     mix firmware
 
     # -------------------------
