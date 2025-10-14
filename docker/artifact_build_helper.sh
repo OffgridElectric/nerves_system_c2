@@ -49,6 +49,14 @@ build() {
     echo "==> Installing dependencies for main workspace"
     cd $WS
     mix deps.get
+    
+    # -------------------------
+    # Build firmware
+    # -------------------------
+    echo "==> Building firmware"
+    cd $WS/test_c2
+    mix firmware
+
 
     VERSION=$(cat "$WS/VERSION" | tr -d '[:space:]')
     ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
@@ -70,23 +78,17 @@ build() {
 	echo "==> Artefact already exists – skipping system build"
     fi
 
-    ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
-	-name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
-	| sort | tail -n 1)
-
-    # -------------------------
-    # Build firmware
-    # -------------------------
-    echo "==> Building firmware"
-    cd $WS/test_c2
-    mix firmware
-
+        
     # -------------------------
     # Generate Nerves artifacts
     # -------------------------
     echo "==> Generating artifacts"
     cd $WS
     mix nerves.artifact
+    
+    ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
+	-name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
+	| sort | tail -n 1)
 
     # -------------------------
     # Copy firmware to artifacts folder
