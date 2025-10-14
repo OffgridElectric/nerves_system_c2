@@ -55,6 +55,7 @@ build() {
     # -------------------------
     echo "==> Building firmware"
     cd $WS/test_c2
+    mix deps.get
     mix firmware
 
 
