@@ -29,6 +29,7 @@ build() {
         ls -l /home/dev/.asdf/asdf.sh
         exit 1
     fi
+    [ -r /home/dev/.asdf/completions/asdf.bash ] && . /home/dev/.asdf/completions/asdf.bash
 
     if [ -r /home/dev/.asdf/completions/asdf.bash ]; then
         . /home/dev/.asdf/completions/asdf.bash
@@ -41,17 +42,30 @@ build() {
     # Ensure artifacts folder exists
     mkdir -p "$WS/artifacts"
 
+    VERSION=$(cat "$WS/VERSION" | tr -d '[:space:]')
+    ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
+                   -name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
+                   | sort | tail -n 1)
 
-    # force a clean system rebuild
-    echo "==> Cleaning & rebuilding nerves_system_c2"
-    export NERVES_SYSTEM_CACHE=none        # ignore any cached system
-    cd "$WS"
-    mix deps.clean --all      # remove pre-built files
+    if [ ! -f "$ARTIFACT_TARBALL" ]; then
+        echo "==> Artefact missing – building Buildroot/Linux system"
+        export NERVES_SYSTEM_CACHE=none
 
-    # -------------------------
-    # Install dependencies
-    # -------------------------
+        "$WS/deps/nerves_system_br/create-build.sh" \
+            "$WS/nerves_defconfig" \
+            "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}" \
+            >/dev/null
 
+        cd "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}"
+        make -j"$(nproc)"
+        cd "$WS"
+    else
+        echo "==> Artefact already exists – skipping system build"
+    fi
+
+    # ------------------------------------------------------------------
+    # 2.  Install deps & build firmware
+    # ------------------------------------------------------------------
     echo "==> Installing dependencies for main workspace"
     cd $WS
     mix deps.get
@@ -86,19 +100,13 @@ build() {
         exit 1
     fi
 
-    # -------------------------
-    # Copy system artifact tarball (based on VERSION)
-    # -------------------------
-    VERSION=$(cat VERSION | tr -d '[:space:]')
-    ARTIFACT_DIR=".nerves/artifacts"
-    LATEST_TAR=$(find "$ARTIFACT_DIR" -type f -name "nerves_system_c2-portable-${VERSION}-*.tar.gz" | sort | tail -n 1)
-
-    if [ -f "$LATEST_TAR" ]; then
-	    echo "==> Copying artifact tarball: $(basename "$LATEST_TAR")"
-	    cp "$LATEST_TAR" "$WS/artifacts/"
+    # system tarball
+    if [ -f "$ARTIFACT_TARBALL" ]; then
+        echo "==> Copying artefact tarball: $(basename "$ARTIFACT_TARBALL")"
+        cp "$ARTIFACT_TARBALL" "$WS/artifacts/"
     else
-	    echo "Warning: No matching artifact tarball found for version $VERSION"
+        echo "Warning: No matching artefact tarball found for version $VERSION"
     fi
 
-    echo "==> Firmware build complete. All artifacts in: $WS/artifacts"
+    echo "==> Build complete. All artefacts in: $WS/artifacts"
 }
