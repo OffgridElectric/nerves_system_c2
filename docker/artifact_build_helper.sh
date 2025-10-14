@@ -76,6 +76,9 @@ build() {
 	echo "==> Artefact already exists – skipping system build"
     fi
 
+    ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
+	-name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
+	| sort | tail -n 1)
 
     # -------------------------
     # Build firmware
