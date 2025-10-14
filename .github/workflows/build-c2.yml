@@ -26,12 +26,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-       # Step 1c: Verify checkout contains required files
-      - name: Verify checkout contains deps
-        run: |
-          ls -l deps/nerves_system_br/create-build.sh   # fail fast if missing
-
-
       # Step 2: Ensure CI SSH key exists
       - name: Ensure CI SSH key exists
         run: |
