@@ -50,11 +50,6 @@ build() {
     cd $WS
     mix deps.get
 
-    echo "==> Installing dependencies for test_c2"
-    cd $WS/test_c2
-    mix deps.get
-
-
     VERSION=$(cat "$WS/VERSION" | tr -d '[:space:]')
     ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
 	-name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
@@ -71,7 +66,6 @@ build() {
 
 	cd "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}"
 	make -j"$(nproc)"
-	cd "$WS"
     else
 	echo "==> Artefact already exists – skipping system build"
     fi
