@@ -17,17 +17,20 @@ jobs:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     steps:
-      # Step 1: Checkout your repo
+      
+      # Step 1: clean cache
+      - name: Clean stale cache
+        run: rm -rf _build deps
+      
+      # Step 1b: Checkout your repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-       # Step 1b: Verify checkout contains required files
+       # Step 1c: Verify checkout contains required files
       - name: Verify checkout contains deps
         run: |
           ls -l deps/nerves_system_br/create-build.sh   # fail fast if missing
 
-      - name: Clean stale cache
-        run: rm -rf _build deps
 
       # Step 2: Ensure CI SSH key exists
       - name: Ensure CI SSH key exists
