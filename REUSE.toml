@@ -102,4 +102,22 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2008 – 2013 Texas Instruments Incorporated"
 SPDX-License-Identifier = "LicenseRef-TI-Release"
 
+# Docker files
+[[annotations]]
+path = [
+ "docker/*"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "None"
+SPDX-License-Identifier = "CC0-1.0"
+
+# Test C2 application files
+[[annotations]]
+path = [
+ "test_c2/*"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "None"
+SPDX-License-Identifier = "CC0-1.0"
+
 
