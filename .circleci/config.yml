@@ -1,0 +1,39 @@
+version: 2.1
+
+jobs:
+  build-nerves-c2:
+    docker:
+      - image: cimg/base:stable   # minimal base to run Docker
+    steps:
+      - checkout
+
+      # Enable Docker-in-Docker
+      - setup_remote_docker:
+          version: 20.10.24
+          docker_layer_caching: true
+
+      # Step 1: Build Docker image
+      - run:
+          name: Build C2 Docker image
+          command: |
+            ./docker/c2_docker_build.sh
+
+      # Step 2: Run firmware build inside container using your shell script
+      - run:
+          name: Run firmware build inside container
+          command: |
+            chmod +x ./docker/c2_docker_shell.sh
+            ./docker/c2_docker_shell.sh "source /work/nerves_system_c2/docker/artifact_build_helper.sh && build"
+
+workflows:
+  version: 2
+  test-c2-artifact:
+    jobs:
+      - build-nerves-c2:
+          filters:
+            branches:
+              only:
+                - vj/c2-artifact-test   # runs only for this branch
+            tags:
+              ignore: /.*/                   # ignore tags
+

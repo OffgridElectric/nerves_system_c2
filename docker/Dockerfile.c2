@@ -1,9 +1,7 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-
-#ENV ASDF_DIR=/opt/asdf
-
+ENV LANG=C.UTF-8
 
 RUN apt-get update && apt-get install -y \
     curl git unzip zip build-essential \
@@ -17,7 +15,6 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Set locale
-ENV LANG=C.UTF-8
 RUN locale-gen en_US.UTF-8
 
 # Install fwup 1.10.1
@@ -25,9 +22,10 @@ RUN wget https://github.com/fwup-home/fwup/releases/download/v1.10.1/fwup_1.10.1
     dpkg -i fwup_1.10.1_amd64.deb || apt-get install -f -y && \
     rm fwup_1.10.1_amd64.deb
 
+# Dynamic user support: defaults are harmless but always overridden by build-arg
 ARG USERNAME=dev
-ARG USER_UID=1000
-ARG USER_GID=1000
+ARG USER_UID=1001
+ARG USER_GID=1001
 
 RUN groupadd --gid $USER_GID $USERNAME \
   && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
@@ -38,18 +36,20 @@ RUN groupadd --gid $USER_GID $USERNAME \
 USER $USERNAME
 WORKDIR /home/$USERNAME
 ENV HOME=/home/$USERNAME
-ENV LANG=en_US.UTF-8
 
 # Add ASDF plugins and install Erlang/Elixir
 ARG ERLANG_VERSION=27.3.4.2
 ARG ELIXIR_VERSION=1.17.3-otp-27
-
 ENV ASDF_DIR=$HOME/.asdf
+
 # Install ASDF
 RUN git clone https://github.com/asdf-vm/asdf.git $ASDF_DIR --branch v0.14.0
-ENV PATH="$ASDF_DIR/bin:$ASDF_DIR/shims:$PATH"
+RUN chown -R $USERNAME:$USERNAME $ASDF_DIR && chmod -R a+rX $ASDF_DIR
 
+# Ensure ASDF is in PATH
+ENV PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
 
+# Install Erlang & Elixir via ASDF
 RUN bash -c ". $ASDF_DIR/asdf.sh && \
     asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git && \
     asdf plugin add elixir https://github.com/asdf-vm/asdf-elixir.git && \
@@ -60,10 +60,21 @@ RUN bash -c ". $ASDF_DIR/asdf.sh && \
     asdf install elixir $ELIXIR_VERSION && \
     asdf global elixir $ELIXIR_VERSION"
 
-# Setup shell init for asdf
-RUN echo ". $ASDF_DIR/asdf.sh" >> ~/.bashrc
+# Auto-load ASDF in both interactive and login shells
+RUN echo ". $ASDF_DIR/asdf.sh" >> /home/$USERNAME/.bashrc && \
+    echo ". $ASDF_DIR/asdf.sh" >> /home/$USERNAME/.bash_profile
 
-# Install Hex, Rebar, and Nerves Bootstrap
+# Fix shell dotfile permissions and ownership explicitly
+USER root
+RUN chown $USERNAME:$USERNAME /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc && \
+    chmod 644 /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc
+
+# Make sure asdf directory is fully readable/executable
+RUN chown -R $USERNAME:$USERNAME $ASDF_DIR && chmod -R a+rX $ASDF_DIR
+
+USER $USERNAME
+
+# Install Hex, Rebar, and Nerves Bootstrap as $USERNAME
 RUN bash -c ". $ASDF_DIR/asdf.sh && \
     mix local.hex --force && \
     mix local.rebar --force && \
