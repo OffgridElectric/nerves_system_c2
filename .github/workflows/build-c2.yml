@@ -3,10 +3,10 @@ name: Build Nerves C2 Firmware
 on:
   push:
     branches:
-      - vj/c2-artifact-test
+      - develop2
   pull_request:
     branches:
-      - vj/c2-artifact-test
+      - develop2
   workflow_dispatch:
 
 jobs:
