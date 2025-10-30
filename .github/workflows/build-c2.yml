@@ -3,10 +3,10 @@ name: Build Nerves C2 Firmware
 on:
   push:
     branches:
-      - develop2
+      - vj/fix_docker_local_build
   pull_request:
     branches:
-      - develop2
+      - vj/fix_docker_local_build
   workflow_dispatch:
 
 jobs:

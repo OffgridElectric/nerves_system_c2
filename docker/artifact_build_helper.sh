@@ -94,8 +94,8 @@ build() {
         echo "==> Artefact missing – building Buildroot/Linux system"
 	export NERVES_SYSTEM_CACHE=none
 
-	"$WS/deps/nerves_system_br/create-build.sh" \
-		"$WS/nerves_defconfig" \
+	"$WS/test_c2/deps/nerves_system_br/create-build.sh" \
+		"$WS/deps/nerves_system_bbb/nerves_defconfig" \
 		"$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}" \
 		>/dev/null
 
