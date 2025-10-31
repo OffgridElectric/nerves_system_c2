@@ -56,14 +56,14 @@ build() {
     #check if asdf.sh is readable
   # CI: source toolchains if needed
     if [[ "$MODE" == "ci" ]]; then
-      if [ -r /home/dev/.asdf/asdf.sh ]; then
-        . /home/dev/.asdf/asdf.sh
+      if [ -r $HOME/.asdf/asdf.sh ]; then
+        . $HOME/.asdf/asdf.sh
       else
-         echo "ERROR: /home/dev/.asdf/asdf.sh is not readable"
-         ls -l /home/dev/.asdf/asdf.sh
+         echo "ERROR: $HOME/.asdf/asdf.sh is not readable"
+         ls -l $HOME/.asdf/asdf.sh
          exit 1
       fi
-      [ -r /home/dev/.asdf/completions/asdf.bash ] && . /home/dev/.asdf/completions/asdf.bash
+      [ -r $HOME/.asdf/completions/asdf.bash ] && . $HOME/.asdf/completions/asdf.bash
     fi
 
     # ------------------------------------------------------------------
@@ -86,7 +86,7 @@ build() {
 
     # Handle Buildroot/system artifact for CI only
     if [[ "$MODE" == "ci" ]]; then
-      ARTIFACT_TARBALL=$(find "/home/dev/.nerves/artifacts" -type f \
+      ARTIFACT_TARBALL=$(find "$HOME/.nerves/artifacts" -type d \
         -name "nerves_system_c2-portable-${VERSION}*" \
 	| sort | tail -n 1)
 
@@ -114,7 +114,7 @@ build() {
     cd $WS
     mix nerves.artifact
     
-    ARTIFACT_TARBALL=$(find "$/home/dev/.nerves/artifacts" -type d \
+    ARTIFACT_TARBALL=$(find "$HOME/.nerves/artifacts" -type d \
 	-name "nerves_system_c2-portable-${VERSION}*" \
 	| sort | tail -n 1)
 
