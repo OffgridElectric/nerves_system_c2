@@ -90,7 +90,7 @@ build() {
         -name "nerves_system_c2-portable-${VERSION}*" \
 	| sort | tail -n 1)
 
-      if [ ! -f "$ARTIFACT_TARBALL" ]; then
+      if [ ! -d "$ARTIFACT_TARBALL" ]; then
         echo "==> Artefact missing – building Buildroot/Linux system"
 	export NERVES_SYSTEM_CACHE=none
 
@@ -114,8 +114,8 @@ build() {
     cd $WS
     mix nerves.artifact
     
-    ARTIFACT_TARBALL=$(find "$HOME/.nerves/artifacts" -type d \
-	-name "nerves_system_c2-portable-${VERSION}*" \
+    ARTIFACT_TARBALL=$(find ".nerves/artifacts" -type f \
+	-name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
 	| sort | tail -n 1)
 
     # -------------------------
