@@ -86,8 +86,8 @@ build() {
 
     # Handle Buildroot/system artifact for CI only
     if [[ "$MODE" == "ci" ]]; then
-      ARTIFACT_TARBALL=$(find "$HOME/.nerves/artifacts" -type d \
-        -name "nerves_system_c2-portable-${VERSION}*" \
+      ARTIFACT_TARBALL=$(find "$HOME/.nerves/artifacts" -type f \
+        -name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
 	| sort | tail -n 1)
 
       if [ ! -d "$ARTIFACT_TARBALL" ]; then
@@ -95,7 +95,7 @@ build() {
 	export NERVES_SYSTEM_CACHE=none
 
 	"$WS/test_c2/deps/nerves_system_br/create-build.sh" \
-		"$WS/deps/nerves_system_bbb/nerves_defconfig" \
+		"$WS/test_c2/deps/nerves_system_bbb/nerves_defconfig" \
 		"$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}" \
 		>/dev/null
 
