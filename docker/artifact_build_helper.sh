@@ -86,8 +86,8 @@ build() {
 
     # Handle Buildroot/system artifact for CI only
     if [[ "$MODE" == "ci" ]]; then
-      ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
-        -name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
+      ARTIFACT_TARBALL=$(find "/home/dev/.nerves/artifacts" -type f \
+        -name "nerves_system_c2-portable-${VERSION}*" \
 	| sort | tail -n 1)
 
       if [ ! -f "$ARTIFACT_TARBALL" ]; then
@@ -114,8 +114,8 @@ build() {
     cd $WS
     mix nerves.artifact
     
-    ARTIFACT_TARBALL=$(find "$WS/.nerves/artifacts" -type f \
-	-name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
+    ARTIFACT_TARBALL=$(find "$/home/dev/.nerves/artifacts" -type d \
+	-name "nerves_system_c2-portable-${VERSION}*" \
 	| sort | tail -n 1)
 
     # -------------------------
