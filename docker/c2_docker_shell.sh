@@ -13,14 +13,14 @@ if [[ $# -lt 1 ]]; then
   usage
 fi
 
-MODE="$1"
-shift
-CMD="${*:-bash}"
-
 COMMON_OPTS="--rm --network host \
   -v $(pwd):/work/nerves_system_c2 \
   -v ${HOME}/.ssh:/home/dev/.ssh:ro \
   -u $(id -u):$(id -g)"
+
+MODE="$1"
+shift
+CMD="${*:-bash}"
 
 if [[ "${MODE}" == "ci" ]]; then
   if [[ -z "${CI_GITHUB_USER:-}" || -z "${CI_GITHUB_TOKEN:-}" ]]; then

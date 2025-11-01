@@ -5,7 +5,8 @@ set -x
 # -----------------------
 # Usage Help
 # -----------------------
-usage() {
+usage()
+{
   echo "Usage: $0 [ci|local] [additional command]"
   echo "  ci:    Run in CI mode (requires CI_GITHUB_USER, CI_GITHUB_TOKEN)"
   echo "  local: Run in local mode"
@@ -24,7 +25,8 @@ EXTRA_CMD="${*:-}"
 # -----------------------------
 # Set environment for C2 firmware
 # -----------------------------
-set_artifact_env() {
+set_artifact_env()
+{
     export MIX_TARGET=c2
     export MIX_ENV=prod
     echo "Environment set: MIX_TARGET=$MIX_TARGET, MIX_ENV=$MIX_ENV"
@@ -43,7 +45,8 @@ set_artifact_env() {
 # -----------------------------
 # Build firmware and artifacts
 # -----------------------------
-build() {
+build()
+{
     set_artifact_env
 
     # Determine workspace from current folder
