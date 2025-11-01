@@ -5,10 +5,10 @@ name: CI
 on:
   push:
     branches-ignore:
-      - vj/c2-artifact-test
+      - vj/fix_docker_local_build
   pull_request:
     branches-ignore:
-      - vj/c2-artifact-test
+      - vj/fix_docker_local_build
 
 
 env:

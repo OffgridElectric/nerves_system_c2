@@ -91,7 +91,7 @@ build() {
 	| sort | tail -n 1)
 
       if [ ! -d "$ARTIFACT_TARBALL" ]; then
-        echo "==> Artefact missing – building Buildroot/Linux system"
+        echo "==> Artifact missing – building Buildroot/Linux system"
 	export NERVES_SYSTEM_CACHE=none
 
 	"$WS/test_c2/deps/nerves_system_br/create-build.sh" \
@@ -102,7 +102,7 @@ build() {
 	cd "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}"
 	make -j"$(nproc)"
       else
-        echo "==> Artefact already exists – skipping system build"
+        echo "==> Artifact already exists – skipping system build"
       fi
     fi
 
