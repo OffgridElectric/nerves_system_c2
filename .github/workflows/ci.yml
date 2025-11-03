@@ -5,10 +5,10 @@ name: CI
 on:
   push:
     branches-ignore:
-      - vj/fix_docker_local_build
+      - develop2
   pull_request:
     branches-ignore:
-      - vj/fix_docker_local_build
+      - develop2
 
 
 env:
