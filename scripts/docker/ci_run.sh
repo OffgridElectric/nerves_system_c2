@@ -35,7 +35,7 @@ if [[ "${MODE}" == "ci" ]]; then
 elif [[ "${MODE}" == "local" ]]; then
   docker run ${COMMON_OPTS} \
     c2_dev \
-    bash -c "source /work/nerves_system_c2/docker/artifact_build_helper.sh local"
+    bash -c "bash /work/nerves_system_c2/scripts/c2_build_local.sh"
 else
   echo "Error: Unknown mode '${MODE}'. Use 'ci' or 'local'."
   usage

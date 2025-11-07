@@ -45,15 +45,15 @@ jobs:
             --build-arg USER_UID=${CI_UID} \
             --build-arg USER_GID=${CI_GID} \
             -t c2_dev \
-            -f docker/Dockerfile.c2 \
-            docker
+            -f scripts/docker/Dockerfile.c2 \
+            scripts/docker
 
       # Build firmware inside container
       - name: Run firmware build inside Docker container
         run: |
-          chmod +x ./docker/c2_docker_shell.sh
-          ./docker/c2_docker_shell.sh ci \
-            "bash /work/nerves_system_c2/docker/artifact_build_helper.sh ci"
+          chmod +x ./scripts/docker/ci_run.sh
+          ./scripts/docker/ci_run.sh ci \
+            "bash /work/nerves_system_c2/scripts/c2_build.sh ci"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
