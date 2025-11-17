@@ -49,6 +49,9 @@ build()
     cd $WS/test_c2
     mix deps.get
     mix firmware
+
+    VERSION=$(cat "$WS/VERSION" | tr -d '[:space:]')
+
         
     # -------------------------
     # Generate Nerves artifacts
