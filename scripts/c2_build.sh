@@ -40,6 +40,9 @@ set_artifact_env()
       export CI_GITHUB_TOKEN="${CI_GITHUB_TOKEN}"
       git config --global url."https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
     fi
+    export CI_GITHUB_USER="${CI_GITHUB_USER}"
+    export CI_GITHUB_TOKEN="${CI_GITHUB_TOKEN}"
+    git config --global url."https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
 }
 
 # -----------------------------
