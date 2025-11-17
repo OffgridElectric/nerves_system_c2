@@ -6,8 +6,6 @@ COMMON_OPTS="--rm --network host \
   -v ${HOME}/.ssh:/home/dev/.ssh:ro \
   -u $(id -u):$(id -g)"
 
-MODE="$1"
-shift
 CMD="${*:-bash}"
 
 require_ci_vars() 
