@@ -2,10 +2,6 @@
 set -euo pipefail
 set -x
 
-MODE="$1"
-shift
-EXTRA_CMD="${*:-}"
-
 # -----------------------------
 # Set environment for C2 firmware
 # -----------------------------
@@ -96,8 +92,3 @@ build()
 # Main
 # -----------------------
 build
-
-if [[ -n "$EXTRA_CMD" ]]; then
-  echo "Executing additional command: $EXTRA_CMD"
-  eval "$EXTRA_CMD"
-fi
