@@ -22,5 +22,5 @@ docker run ${COMMON_OPTS} \
   -e CI_GITHUB_USER="${CI_GITHUB_USER}" \
   -e CI_GITHUB_TOKEN="${CI_GITHUB_TOKEN}" \
   c2_dev \
-  bash -lc "${CMD}" || { echo "Error: Docker command failed."; exit 3; }
+  bash -lc "${CMD}" || { echo "Error: Docker run command failed."; exit 3; }
 
