@@ -2,26 +2,6 @@
 set -euo pipefail
 set -x
 
-# -----------------------
-# Usage Help
-# -----------------------
-usage()
-{
-  echo "Usage: $0 [ci|local] [additional command]"
-  echo "  ci:    Run in CI mode (requires CI_GITHUB_USER, CI_GITHUB_TOKEN)"
-  echo "  local: Run in local mode"
-  echo "Optional: pass command to execute after build"
-  exit 1
-}
-
-if [[ $# -lt 1 || ($1 != "ci" && $1 != "local") ]]; then
-  usage
-fi
-
-MODE="$1"
-shift
-EXTRA_CMD="${*:-}"
-
 # -----------------------------
 # Set environment for C2 firmware
 # -----------------------------
@@ -31,15 +11,13 @@ set_artifact_env()
     export MIX_ENV=prod
     echo "Environment set: MIX_TARGET=$MIX_TARGET, MIX_ENV=$MIX_ENV"
 
-    if [[ "$MODE" == "ci" ]]; then
-      if [[ -z "${CI_GITHUB_USER:-}" || -z "${CI_GITHUB_TOKEN:-}" ]]; then
-        echo "Error: CI_GITHUB_USER and CI_GITHUB_TOKEN required for CI mode."
-        exit 2
-      fi
-      export CI_GITHUB_USER="${CI_GITHUB_USER}"
-      export CI_GITHUB_TOKEN="${CI_GITHUB_TOKEN}"
-      git config --global url."https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
+    if [[ -z "${CI_GITHUB_USER:-}" || -z "${CI_GITHUB_TOKEN:-}" ]]; then
+	    echo "Error: CI_GITHUB_USER and CI_GITHUB_TOKEN required for CI mode."
+	    exit 2
     fi
+    export CI_GITHUB_USER="${CI_GITHUB_USER}"
+    export CI_GITHUB_TOKEN="${CI_GITHUB_TOKEN}"
+    git config --global url."https://${CI_GITHUB_USER}:${CI_GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
 }
 
 # -----------------------------
@@ -56,19 +34,7 @@ build()
       echo "Error: Workspace $WS does not exist"
       exit 1
     fi
-    #check if asdf.sh is readable
-  # CI: source toolchains if needed
-    if [[ "$MODE" == "ci" ]]; then
-      if [ -r $HOME/.asdf/asdf.sh ]; then
-        . $HOME/.asdf/asdf.sh
-      else
-         echo "ERROR: $HOME/.asdf/asdf.sh is not readable"
-         ls -l $HOME/.asdf/asdf.sh
-         exit 1
-      fi
-      [ -r $HOME/.asdf/completions/asdf.bash ] && . $HOME/.asdf/completions/asdf.bash
-    fi
-
+  
     # ------------------------------------------------------------------
     # 2.  Install deps & build firmware
     # ------------------------------------------------------------------
@@ -84,30 +50,7 @@ build()
     mix deps.get
     mix firmware
 
-
     VERSION=$(cat "$WS/VERSION" | tr -d '[:space:]')
-
-    # Handle Buildroot/system artifact for CI only
-    if [[ "$MODE" == "ci" ]]; then
-      ARTIFACT_TARBALL=$(find "$HOME/.nerves/artifacts" -type f \
-        -name "nerves_system_c2-portable-${VERSION}-*.tar.gz" \
-	| sort | tail -n 1)
-
-      if [ ! -d "$ARTIFACT_TARBALL" ]; then
-        echo "==> Artifact missing – building Buildroot/Linux system"
-	export NERVES_SYSTEM_CACHE=none
-
-	"$WS/test_c2/deps/nerves_system_br/create-build.sh" \
-		"$WS/test_c2/deps/nerves_system_bbb/nerves_defconfig" \
-		"$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}" \
-		>/dev/null
-
-	cd "$WS/.nerves/artifacts/nerves_system_c2-portable-${VERSION}"
-	make -j"$(nproc)"
-      else
-        echo "==> Artifact already exists – skipping system build"
-      fi
-    fi
 
         
     # -------------------------
@@ -152,8 +95,3 @@ build()
 # Main
 # -----------------------
 build
-
-if [[ -n "$EXTRA_CMD" ]]; then
-  echo "Executing additional command: $EXTRA_CMD"
-  eval "$EXTRA_CMD"
-fi

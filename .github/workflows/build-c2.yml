@@ -52,8 +52,8 @@ jobs:
       - name: Run firmware build inside Docker container
         run: |
           chmod +x ./scripts/docker/ci_run.sh
-          ./scripts/docker/ci_run.sh ci \
-            "bash /work/nerves_system_c2/scripts/c2_build.sh ci"
+          ./scripts/docker/ci_run.sh \
+            "bash /work/nerves_system_c2/scripts/c2_build.sh"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
