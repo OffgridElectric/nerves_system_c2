@@ -1,0 +1,86 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+
+RUN apt-get update && apt-get install -y \
+    curl git unzip zip build-essential \
+    libssl-dev libncurses-dev m4 cmake \
+    autoconf libwxgtk3.0-gtk3-dev libgl1-mesa-dev libglu1-mesa-dev \
+    libpng-dev libssh-dev unixodbc-dev \
+    udev gcc g++ ssh locales \
+    wget gnupg ca-certificates \
+    libreadline-dev pkg-config nano squashfs-tools file cpio rsync bc \
+    sudo \
+    && apt-get clean
+
+# Set locale
+RUN locale-gen en_US.UTF-8
+
+# Install fwup 1.10.1
+RUN wget https://github.com/fwup-home/fwup/releases/download/v1.10.1/fwup_1.10.1_amd64.deb && \
+    dpkg -i fwup_1.10.1_amd64.deb || apt-get install -f -y && \
+    rm fwup_1.10.1_amd64.deb
+
+# Dynamic user support: defaults are harmless but always overridden by build-arg
+ARG USERNAME=dev
+ARG USER_UID=1001
+ARG USER_GID=1001
+
+RUN groupadd --gid $USER_GID $USERNAME \
+  && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+  && chsh -s /bin/bash $USERNAME \
+  && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+  && chmod 0440 /etc/sudoers.d/$USERNAME
+
+RUN mkdir -p /home/$USERNAME/.ssh && \
+    chown -R ${USERNAME}:${USERNAME} /home/dev/.ssh
+USER $USERNAME
+WORKDIR /home/$USERNAME
+ENV HOME=/home/$USERNAME
+
+# Add ASDF plugins and install Erlang/Elixir
+ARG ERLANG_VERSION=27.3.4.2
+ARG ELIXIR_VERSION=1.17.3-otp-27
+ENV ASDF_DIR=$HOME/.asdf
+
+# Install ASDF
+RUN git clone https://github.com/asdf-vm/asdf.git $ASDF_DIR --branch v0.14.0
+RUN chown -R $USERNAME:$USERNAME $ASDF_DIR && chmod -R a+rX $ASDF_DIR
+
+# Ensure ASDF is in PATH
+ENV PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
+
+# Install Erlang & Elixir via ASDF
+RUN bash -c ". $ASDF_DIR/asdf.sh && \
+    asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git && \
+    asdf plugin add elixir https://github.com/asdf-vm/asdf-elixir.git && \
+    export KERL_BUILD_DOCS=no && \
+    export KERL_CONFIGURE_OPTIONS='--disable-debug --without-javac' && \
+    asdf install erlang $ERLANG_VERSION && \
+    asdf global erlang $ERLANG_VERSION && \
+    asdf install elixir $ELIXIR_VERSION && \
+    asdf global elixir $ELIXIR_VERSION"
+
+# Auto-load ASDF in both interactive and login shells
+RUN echo ". $ASDF_DIR/asdf.sh" >> /home/$USERNAME/.bashrc && \
+    echo ". $ASDF_DIR/asdf.sh" >> /home/$USERNAME/.bash_profile
+
+# Fix shell dotfile permissions and ownership explicitly
+USER root
+RUN chown $USERNAME:$USERNAME /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc && \
+    chmod 644 /home/$USERNAME/.bash_profile /home/$USERNAME/.bashrc
+
+# Make sure asdf directory is fully readable/executable
+RUN chown -R $USERNAME:$USERNAME $ASDF_DIR && chmod -R a+rX $ASDF_DIR
+
+USER $USERNAME
+
+# Install Hex, Rebar, and Nerves Bootstrap as $USERNAME
+RUN bash -c ". $ASDF_DIR/asdf.sh && \
+    mix local.hex --force && \
+    mix local.rebar --force && \
+    mix archive.install hex nerves_bootstrap --force"
+
+# Default command
+CMD ["/bin/bash"]
