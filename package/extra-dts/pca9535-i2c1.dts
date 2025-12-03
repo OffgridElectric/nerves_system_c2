@@ -1,0 +1,29 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "ti,beaglebone", "ti,beaglebone-black";
+    part-number = "BB-TCA9535-I2C2";
+    version = "00A0";
+
+    /* Attach to the correct I2C bus */
+    fragment@0 {
+        target = <&i2c1>;
+        __overlay__ {
+            status = "okay";
+
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            tca9535@20 {
+                compatible = "ti,tca9535", "nxp,pca9535";
+                reg = <0x20>;
+                gpio-controller;
+                #gpio-cells = <2>;
+                interrupt-controller;
+                #interrupt-cells = <2>;
+            };
+        };
+    };
+};
+
