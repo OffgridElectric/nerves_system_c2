@@ -3,93 +3,105 @@
 
 / {
     compatible = "ti,beaglebone", "ti,beaglebone-black";
+    part-number = "ZOLA-LCD-ILI9488-ADS7846";
+    version = "00A1";
 
-    part-number = "BB-LCD-WAVESHARE-35";
-    version = "00A0";
-
-    /* ----------------------------------------------------------
-     * Pinmux: disable conflicting pins from other capes
-     * ---------------------------------------------------------- */
+    /* Fragment 1: Pinmux: Separate SPI and GPIO Pins */
     fragment@0 {
-        target = <&ocp>;
-        __overlay__ {
-            P8_08_pinmux  { status = "disabled"; };  /* D/C - gpio2[3] */
-            P8_09_pinmux  { status = "disabled"; };  /* RESET - gpio2[5] */
-            P8_10_pinmux { status = "disabled"; };  /* CS - gpio2[4] */
-            P9_18_pinmux { status = "disabled"; };  /* SPI0_D1 MOSI */
-            P9_21_pinmux { status = "disabled"; };  /* SPI0_D0 MISO */
-            P9_22_pinmux { status = "disabled"; };  /* SPI0_SCLK */
-            /* P9_4 is fixed 3.3V power, no pinmux needed */
-        };
-    };
-
-    /* ----------------------------------------------------------
-     * Pinmux: SPI0 + GPIO for display
-     * ---------------------------------------------------------- */
-    fragment@1 {
         target = <&am33xx_pinmux>;
         __overlay__ {
-            bb_spi0_pins: pinmux_bb_spi0_pins {
+            /* Only SPI1 master pins (SCLK, MISO, MOSI) */
+            zola_spi1_pins: pinmux_zola_spi1_pins {
                 pinctrl-single,pins = <
-                    0x150 0x30    /* spi0_sclk (P9_22) OUTPUT | MODE0 */
-                    0x154 0x30    /* spi0_d0 (P9_21) INPUT | MODE0 */
-                    0x158 0x10    /* spi0_d1 (P9_18) OUTPUT | MODE0 */
-                    /* CS (P8_10) controlled manually via GPIO68 */
+                    0x190 0x33    /* A13: SPI1_SCLK | MODE3 | INPUT_PULLUP */
+                    0x194 0x13    /* B13: SPI1_D0 (MOSI) | MODE3 | OUTPUT */
+                    0x198 0x33    /* D12: SPI1_D1 (MISO) | MODE3 | INPUT_PULLUP */
                 >;
             };
 
-            bb_lcd_gpio_pins: pinmux_bb_lcd_gpio_pins {
+            /* LCD Control GPIOs (RS, RESET, CS) + Touch Control GPIOs (IRQ, CS) + Backlight */
+            zola_lcd_touch_gpio_pins: pinmux_zola_lcd_touch_gpio_pins {
                 pinctrl-single,pins = <
-                    0x094 0x07    /* P8_8 - D/C gpio2[3] OUTPUT */
-                    0x09C 0x07    /* P8_9 - RESET gpio2[5] OUTPUT */
-                    0x098 0x07    /* P8_10 - CS gpio2[4] OUTPUT */
+                    /* LCD Control GPIOs */
+                    0x030 0x07    /* T3: TFT_RS (GPIO2_12) OUTPUT | MODE7 */
+                    0x028 0x07    /* T1: TFT_RST (GPIO2_10) OUTPUT | MODE7 */
+                    0x1A0 0x13    /* B12: TFT_CS (GPIO3_18) OUTPUT | MODE3 */
+
+                    /* Touch Control GPIOs */
+                    0x1A4 0x13    /* C13: TP_CS (GPIO3_19) OUTPUT | MODE3 */
+                    0x034 0x27    /* T4: TP_IRQ (GPIO2_13) INPUT_PULLUP | MODE7 */
+
+                    /* Backlight Control */
+                    0x1A8 0x07    /* D13: LCD_LED (GPIO3_20) OUTPUT | MODE7 */
                 >;
             };
         };
     };
 
-    /* ----------------------------------------------------------
-     * Backlight
-     * ---------------------------------------------------------- */
-    fragment@2 {
+    /* Fragment 1: Backlight Control */
+    fragment@1 {
         target-path = "/";
         __overlay__ {
-            backlight_fixed: backlight_fixed {
+            backlight_zola: backlight_zola {
                 compatible = "gpio-backlight";
-                gpios = <&gpio0 0 0>; /* Dummy GPIO for always-on (P9_4 3.3V) */
+                gpios = <&gpio3 20 0>; /* D13: GPIO3_20 */
                 default-on;
             };
         };
     };
 
-    /* ----------------------------------------------------------
-     * SPI0 display device node
-     * ---------------------------------------------------------- */
-    fragment@3 {
-        target = <&spi0>;
+    /* Fragment 2: SPI1 controller and device nodes */
+    fragment@2 {
+        target = <&spi1>;
         __overlay__ {
             status = "okay";
             #address-cells = <1>;
             #size-cells = <0>;
+
+            /* SPI master pins applied to controller */
             pinctrl-names = "default";
-            pinctrl-0 = <&bb_spi0_pins &bb_lcd_gpio_pins>;
+            pinctrl-0 = <&zola_spi1_pins>;
 
+            /* ILI9488 LCD device */
             display@0 {
-                compatible = "waveshare,pico-rt-lcd-35", "ili9488";
-                reg = <0>;                        /* SPI CS0 */
-                spi-max-frequency = <32000000>;   /* 32 MHz SPI */
-                spi-cs-gpios = <&gpio2 4 0>;      /* manual CS - P8_10 gpio68 */
+                compatible = "ilitek,ili9488";
+                reg = <0>;                         /* Chip Select 0 (B12) */
+                spi-max-frequency = <24000000>;
 
-                dc-gpios    = <&gpio2 3 0>;       /* D/C - P8_8 gpio67 */
-                reset-gpios = <&gpio2 5 0>;       /* RESET - P8_9 gpio69 */
+                /* Applied separate pinctrl for GPIOs as in your reference */
+                pinctrl-names = "default";
+                pinctrl-0 = <&zola_lcd_touch_gpio_pins>;
 
-                backlight = <&backlight_fixed>;
-                rotation = <180>;
+                /* GPIO Definitions using verified offsets */
+                dc-gpios    = <&gpio2 12 0>;       /* T3: GPIO2_12 */
+                reset-gpios = <&gpio2 10 0>;       /* T1: GPIO2_10 */
+
+                backlight = <&backlight_zola>;
+                rotation = <270>;
+                buswidth = <8>;
 
                 width = <480>;
                 height = <320>;
             };
+
+            /* ADS7846 Touch device */
+            touch@1 {
+                compatible = "ti,ads7846";
+                reg = <1>;                         /* Chip Select 1 (C13) */
+                spi-max-frequency = <2000000>;
+
+                /* Touch GPIO Configuration */
+                interrupt-parent = <&gpio2>;
+                interrupts = <13 2>;               /* T4: GPIO2_13, Falling Edge '2' */
+                pendown-gpio = <&gpio2 13 0>;
+
+                ti,x-min = /bits/ 16 <200>;
+                ti,x-max = /bits/ 16 <3900>;
+                ti,y-min = /bits/ 16 <200>;
+                ti,y-max = /bits/ 16 <3900>;
+                ti,pressure-max = /bits/ 16 <255>;
+                status = "okay";
+            };
         };
     };
 };
-
