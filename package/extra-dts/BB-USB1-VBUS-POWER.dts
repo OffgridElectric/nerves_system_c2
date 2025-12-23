@@ -30,7 +30,7 @@
                 pinctrl-names = "default";
                 pinctrl-0 = <&usb1_vbus_pins>;
 
-                gpio = <&gpio3 13 GPIO_ACTIVE_LOW>;
+                gpio = <&gpio3 13 1>;
                 enable-active-low;
 
                 /* optional */
