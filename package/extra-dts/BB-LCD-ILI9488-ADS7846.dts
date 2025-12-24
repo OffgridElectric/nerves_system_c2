@@ -103,6 +103,7 @@
 
             /* -------- Touch -------- */
             ads7846@1 {
+            /* ADS7846 Touch device */
                 compatible = "ti,ads7846";
                 reg = <1>;                         /* Chip Select 1 (C13) */
                 spi-max-frequency = <2000000>;
@@ -125,8 +126,17 @@
     fragment@4 {
         target = <&mmc1>;
         __overlay__ {
-            broken-cd; /* Stops MMC from claiming A13  */
+            broken-cd;
         };
+    };
+
+    /* Fragment 5: Fix MMC0 (eMMC) Conflict on PIN12/T3 */
+    fragment@5 {
+        target = <&mmc0>;
+        __overlay__ {
+            /* Force MMC0 to release PIN12 by redefining its pinctrl */
+            ti,non-removable;
+        } ;
     };
 };
 
