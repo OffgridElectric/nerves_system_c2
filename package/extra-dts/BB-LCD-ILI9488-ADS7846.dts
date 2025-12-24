@@ -6,8 +6,26 @@
     part-number = "ZOLA-LCD-ILI9488-ADS7846";
     version = "00A1";
 
-    /* Fragment 1: Pinmux: Separate SPI and GPIO Pins */
+
+    /* Fragment 0: Release J31 pins from legacy OCP/Helper ownership */
     fragment@0 {
+        target = <&ocp>;
+        __overlay__ {
+            P9_31_pinmux { status = "disabled"; }; /* Ball A13: SPI1_SCLK */
+            P9_29_pinmux { status = "disabled"; }; /* Ball B13: SPI1_D0 */
+            P9_30_pinmux { status = "disabled"; }; /* Ball D12: SPI1_D1 */
+            P9_28_pinmux { status = "disabled"; }; /* Ball C13: TP_CS */
+            P9_42_pinmux { status = "disabled"; }; /* Ball B12: TFT_CS */
+
+            /* Disable the LED and helper nodes to prevent probe conflicts */
+            led_pins { status = "disabled"; };
+            cape-universal { status = "disabled"; };
+        };
+    };
+
+
+    /* Fragment 1: Pinmux: Separate SPI and GPIO Pins */
+    fragment@1 {
         target = <&am33xx_pinmux>;
         __overlay__ {
             /* Only SPI1 master pins (SCLK, MISO, MOSI) */
@@ -38,8 +56,8 @@
         };
     };
 
-    /* Fragment 1: Backlight Control */
-    fragment@1 {
+    /* Fragment 2: Backlight Control */
+    fragment@2 {
         target-path = "/";
         __overlay__ {
             backlight_zola: backlight_zola {
@@ -50,8 +68,8 @@
         };
     };
 
-    /* Fragment 2: SPI1 controller and device nodes */
-    fragment@2 {
+    /* Fragment 3: SPI1 controller and device nodes */
+    fragment@3 {
         target = <&spi1>;
         __overlay__ {
             status = "okay";
