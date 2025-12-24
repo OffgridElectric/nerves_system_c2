@@ -121,5 +121,12 @@
             };
         };
     };
+    /* Fragment 4: Solve fix SD/MMC Conflict */
+    fragment@4 {
+        target = <&mmc1>;
+        __overlay__ {
+            broken-cd; /* Stops MMC from claiming A13  */
+        };
+    };
 };
 
