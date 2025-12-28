@@ -18,6 +18,7 @@
             P8_39_pinmux { status = "disabled"; }; /* free LCD_DATA6 / GPMC_A6 (GPIO2_12, PIN46) */
             P9_91_pinmux { status = "disabled"; }; /* LCD_LED */
             P8_40_pinmux { status = "disabled"; }; /* LCD_DATA7 / TP_IRQ */
+
             cape-universal { status = "disabled"; };
         };
     };
@@ -95,6 +96,9 @@
                 reset-gpios = <&gpio0 13 0>; /* TFT_RST */
                 backlight   = <&backlight_zola>;
 
+                pinctrl-names = "default";
+                pinctrl-0 = <&zola_lcd_gpio_pins>;
+
                 rotation = <270>;
                 buswidth = <8>;
                 width = <480>;
@@ -103,10 +107,11 @@
 
             /* -------- Touch -------- */
             ads7846@1 {
-            /* ADS7846 Touch device */
                 compatible = "ti,ads7846";
                 reg = <1>;                         /* Chip Select 1 (C13) */
                 spi-max-frequency = <2000000>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&zola_touch_gpio_pins>;
 
                 /* Touch GPIO Configuration */
                 interrupt-parent = <&gpio2>;
@@ -121,22 +126,6 @@
                 status = "okay";
             };
         };
-    };
-    /* Fragment 4: Solve fix SD/MMC Conflict */
-    fragment@4 {
-        target = <&mmc1>;
-        __overlay__ {
-            broken-cd;
-        };
-    };
-
-    /* Fragment 5: Fix MMC0 (eMMC) Conflict on PIN12/T3 */
-    fragment@5 {
-        target = <&mmc0>;
-        __overlay__ {
-            /* Force MMC0 to release PIN12 by redefining its pinctrl */
-            ti,non-removable;
-        } ;
     };
 };
 
