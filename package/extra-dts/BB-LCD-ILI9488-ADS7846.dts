@@ -6,7 +6,6 @@
     part-number = "ZOLA-LCD-ILI9488-ADS7846";
     version = "00A1";
 
-
     /* Fragment 0: Release J31 pins from legacy OCP/Helper ownership */
     fragment@0 {
         target = <&ocp>;
@@ -20,7 +19,6 @@
             cape-universal { status = "disabled"; };
         };
     };
-
 
     /* Fragment 1: Pinmux: Separate SPI and GPIO Pins */
     fragment@1 {
@@ -76,15 +74,20 @@
             #size-cells = <0>;
 
             pinctrl-names = "default";
-            pinctrl-0 = <&zola_spi1_pins>;
+            pinctrl-0 = <
+                &zola_spi1_pins
+                &zola_lcd_gpio_pins
+                &zola_touch_gpio_pins
+            >;
+
+            /delete-node/ channel@0;
+            /delete-node/ channel@1;
 
             /* -------- LCD -------- */
             ili9488@0 {
                 compatible = "ilitek,ili9488";
                 reg = <0>;
                 spi-max-frequency = <24000000>;
-                pinctrl-names = "default";
-                pinctrl-0 = <&zola_lcd_gpio_pins>;
 
                 dc-gpios    = <&gpio2 12 0>; /* TFT_RS */
                 reset-gpios = <&gpio2 10 0>; /* TFT_RST */
@@ -101,8 +104,6 @@
                 compatible = "ti,ads7846";
                 reg = <1>;                         /* Chip Select 1 (C13) */
                 spi-max-frequency = <2000000>;
-                pinctrl-names = "default";
-                pinctrl-0 = <&zola_touch_gpio_pins>;
 
                 /* Touch GPIO Configuration */
                 interrupt-parent = <&gpio2>;
