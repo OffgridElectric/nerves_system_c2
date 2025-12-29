@@ -25,7 +25,8 @@
                 regulator-name = "usb1_vbus";
                 regulator-min-microvolt = <5000000>;
                 regulator-max-microvolt = <5000000>;
-                regulator-max-microamp = <500000>;
+                /* Updated to 1A (2000mA) */
+                regulator-max-microamp = <2000000>;
 
                 pinctrl-names = "default";
                 pinctrl-0 = <&usb1_vbus_pins>;
