@@ -110,8 +110,6 @@
                 compatible = "ti,ads7846";
                 reg = <1>;                         /* Chip Select 1 (C13) */
                 spi-max-frequency = <2000000>;
-                pinctrl-names = "default";
-                pinctrl-0 = <&zola_touch_gpio_pins>;
 
                 /* Touch GPIO Configuration */
                 interrupt-parent = <&gpio2>;
