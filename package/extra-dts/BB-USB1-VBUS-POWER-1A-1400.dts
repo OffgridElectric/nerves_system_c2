@@ -1,0 +1,51 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+    /* Pinmux for USB1_DRVVBUS (gpio3_13) */
+    fragment@0 {
+        target = <&am33xx_pinmux>;
+        __overlay__ {
+            usb1_vbus_pins: pinmux_usb1_vbus_pins {
+                pinctrl-single,pins = <
+                    0x0f4 0x07  /* usb1_drvvbus, MODE7 | OUTPUT */
+                >;
+            };
+        };
+    };
+
+    /* Fixed 5V regulator for USB1 VBUS */
+    fragment@1 {
+        target-path = "/";
+        __overlay__ {
+            usb1_vbus: regulator-usb1-vbus {
+                compatible = "regulator-fixed";
+                regulator-name = "usb1_vbus";
+                regulator-min-microvolt = <5000000>;
+                regulator-max-microvolt = <5000000>;
+                /* Updated to 1A (2000mA) */
+                regulator-max-microamp = <1000000>;
+
+                pinctrl-names = "default";
+                pinctrl-0 = <&usb1_vbus_pins>;
+
+                gpio = <&gpio3 13 1>;
+                enable-active-low;
+
+                /* optional */
+                /* regulator-always-on; */
+            };
+        };
+    };
+
+    /* USB1 controller */
+    fragment@2 {
+        target-path = "/ocp/target-module@47400000/usb@1400";
+        __overlay__ {
+            dr_mode = "host";
+            vbus-supply = <&usb1_vbus>;
+        };
+    };
+};
