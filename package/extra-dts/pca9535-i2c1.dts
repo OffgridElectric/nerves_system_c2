@@ -3,8 +3,8 @@
 
 / {
     compatible = "ti,beaglebone", "ti,beaglebone-black";
-    part-number = "BB-TCA9535-I2C2";
-    version = "00A0";
+    part-number = "BB-TCA9535-I2C1";
+    version = "00A1";
 
     /* Attach to the correct I2C bus */
     fragment@0 {
@@ -17,7 +17,7 @@
 
             tca9535@20 {
                 compatible = "ti,tca9535", "nxp,pca9535";
-                reg = <0x20>;
+                reg = <0x21>;
                 gpio-controller;
                 #gpio-cells = <2>;
                 interrupt-controller;
