@@ -19,6 +19,8 @@
                 reg = <0x21>;
                 gpio-controller;
                 #gpio-cells = <2>;
+                /* Essential for GPIO chardev interface */
+                gpio-ranges = <&am33xx_pinmux 496 0 16>;
             };
         };
     };
