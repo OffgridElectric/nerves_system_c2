@@ -30,9 +30,9 @@
             /* Only SPI1 master pins (SCLK, MISO, MOSI) */
             zola_spi1_pins: pinmux_zola_spi1_pins {
                 pinctrl-single,pins = <
-                    0x190 0x30   /* MCASP0_ACLKX  -> SPI1_SCLK */
-                    0x194 0x30   /* MCASP0_FSX    -> SPI1_MOSI */
-                    0x198 0x30   /* MCASP0_AXR0   -> SPI1_MISO */
+                    0x190 0x33   /* MCASP0_ACLKX  -> SPI1_SCLK */
+                    0x194 0x33   /* MCASP0_FSX    -> SPI1_MOSI */
+                    0x198 0x13   /* MCASP0_AXR0   -> SPI1_MISO */
                     0x1a0 0x07   /* MCASP0_ACLKR  -> SPI1_CS0 (LCD) */
                     0x1a4 0x07   /* MCASP0_FSR    -> SPI1_CS1 (Touch) */
                 >;
