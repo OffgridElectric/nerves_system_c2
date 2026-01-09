@@ -15,9 +15,10 @@
             P9_30_pinmux { status = "disabled"; }; /* Ball D12: SPI1_D1 */
             P9_28_pinmux { status = "disabled"; }; /* Ball C13: TP_CS */
             P9_92_pinmux { status = "disabled"; }; /* Ball B12: TFT_CS */
-            P8_39_pinmux { status = "disabled"; }; /* free LCD_DATA6 / GPMC_A6 (GPIO2_12, PIN46) */
+            P8_39_pinmux { status = "disabled"; }; /* free LCD_DATA6 */
             P9_91_pinmux { status = "disabled"; }; /* LCD_LED */
             P8_40_pinmux { status = "disabled"; }; /* LCD_DATA7 / TP_IRQ */
+            P9_27_pinmux { status = "disabled"; };
             cape-universal { status = "disabled"; };
         };
     };
@@ -29,11 +30,11 @@
             /* Only SPI1 master pins (SCLK, MISO, MOSI) */
             zola_spi1_pins: pinmux_zola_spi1_pins {
                 pinctrl-single,pins = <
-                    0x190 0x30   /* MCASP0_ACLKX  -> SPI1_SCLK */
-                    0x194 0x30   /* MCASP0_FSX    -> SPI1_MOSI */
-                    0x198 0x30   /* MCASP0_AXR0   -> SPI1_MISO */
-                    0x19c 0x30   /* MCASP0_AXR2   -> SPI1_CS0 (LCD) */
-                    0x1a0 0x30   /* MCASP0_AXR3   -> SPI1_CS1 (Touch) */
+                    0x190 0x33   /* MCASP0_ACLKX  -> SPI1_SCLK */
+                    0x194 0x33   /* MCASP0_FSX    -> SPI1_MOSI */
+                    0x198 0x13   /* MCASP0_AXR0   -> SPI1_MISO */
+                    0x1a0 0x07   /* MCASP0_ACLKR  -> SPI1_CS0 (LCD) */
+                    0x1a4 0x07   /* MCASP0_FSR    -> SPI1_CS1 (Touch) */
                 >;
             };
 
@@ -90,9 +91,9 @@
                 compatible = "ilitek,ili9488";
                 reg = <0>;
                 spi-max-frequency = <24000000>;
-
+                cs-gpios = <&gpio3 18 1>;
                 dc-gpios    = <&gpio2 12 0>; /* TFT_RS */
-                reset-gpios = <&gpio0 13 0>; /* TFT_RST */
+                reset-gpios = <&gpio0 13 1>; /* TFT_RST */
                 backlight   = <&backlight_zola>;
 
                 rotation = <270>;
@@ -108,6 +109,7 @@
                 spi-max-frequency = <2000000>;
 
                 /* Touch GPIO Configuration */
+                cs-gpios     = <&gpio3 19 1>;
                 interrupt-parent = <&gpio2>;
                 interrupts = <13 2>;            /* GPIO2_13, falling edge */
                 pendown-gpio = <&gpio2 13 1>;   /* active low */
