@@ -38,6 +38,9 @@ defmodule TestC2.MixProject do
       # Allow Nerves.Runtime on host to support development, testing and CI.
       # See config/host.exs for usage.
       {:nerves_runtime, "~> 0.13.0"},
+      {:nerves_runtime_shell, "~> 0.1.0"},
+      {:circuits_uart, "~> 1.5"},
+      {:circuits_gpio, "~> 1.0"},
 
       # Dependencies for all targets except :host
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
