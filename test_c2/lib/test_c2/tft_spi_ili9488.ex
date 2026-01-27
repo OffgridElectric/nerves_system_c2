@@ -4,7 +4,7 @@ defmodule Ili9488 do
     # For C2 V2  spidev1.0
     @tft_cs   114  # Chip Select GPIO
     @tft_dc   76   # Data/Command GPIO
-    @tft_rst  29   # Reset GPIO
+    @tft_rst  74   # Reset GPIO
     @spi_device "spidev1.0"
 
   """
