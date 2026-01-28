@@ -25,7 +25,7 @@
 		"P9.31",	/* spi1_sclk */
 		"P9.29",	/* spi1_d0 */
 		"P9.30",	/* spi1_d1 */
-		"P9.28",	/* spi1_cs0 */
+		// "P9.28",	/* spi1_cs0 */
 		// "P9.42",	/* spi1_cs1 */
 		/* the hardware ip uses */
 		"spi1";
