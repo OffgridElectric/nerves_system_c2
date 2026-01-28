@@ -1,5 +1,5 @@
 defmodule TFTTest do
-  use Bitwise   # for <<< and |||
+  import Bitwise   # for <<< and |||
 
   @spi_opts [mode: 0, bits_per_word: 8, speed_hz: 1_000_000]
   # For C2 V2  spidev1.0
@@ -8,16 +8,9 @@ defmodule TFTTest do
   @tft_rst  74   # Reset GPIO
   @spi_device "spidev1.0"
 
-"""
-  #For BBB with spidev0.0
-  @tft_cs   68
-  @tft_dc   67
-  @tft_rst  69
-  @spi_device "spidev0.0"
-"""
   def start do
-    # Open SPI (bus "spidev0.0" or adjust if different)
-    {:ok, spi} = Circuits.SPI.open("spidev1.0", @spi_opts)
+    # Open SPI
+    {:ok, spi} = Circuits.SPI.open(@spi_device, @spi_opts)
 
     # Setup GPIOs
     {:ok, cs}  = Circuits.GPIO.open(@tft_cs, :output)

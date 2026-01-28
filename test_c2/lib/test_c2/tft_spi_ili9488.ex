@@ -7,14 +7,6 @@ defmodule Ili9488 do
     @tft_rst  74   # Reset GPIO
     @spi_device "spidev1.0"
 
-  """
-    #For BBB with spidev0.0
-    @tft_cs   68
-    @tft_dc   67
-    @tft_rst  69
-    @spi_device "spidev0.0"
-  """
-
   @spi_opts [mode: 0, bits_per_word: 8, speed_hz: 1_000_000]
 
   @width  320
@@ -40,7 +32,6 @@ defmodule Ili9488 do
 
     Circuits.GPIO.write(cs, 1)
     reset_display(devs)
-    #init_display(devs)
     new_init_display(devs)
     {:ok, devs}
   end
@@ -121,32 +112,7 @@ defmodule Ili9488 do
   :timer.sleep(25)
 end
 
-
-  defp init_display(devs) do
-    send_command(devs, 0x01)
-    :timer.sleep(10)
-
-    send_command(devs, 0x11)
-    :timer.sleep(120)
-
-    send_command(devs, 0x13)
-    :timer.sleep(10)
-
-    # MADCTL
-    send_command(devs, @cmd_memory_access)
-    send_data(devs, <<0x48>>)  # Normal RGB
-
-    # Pixel format: 18-bit RGB666
-    send_command(devs, @cmd_pixel_format)
-    send_data(devs, <<0x66>>)
-    :timer.sleep(10)
-
-    send_command(devs, 0xB4)
-    :timer.sleep(10)
-
-    send_command(devs, 0x29)
-  end
-
+  
   # -----------------------
   # Fill colors
   # -----------------------
