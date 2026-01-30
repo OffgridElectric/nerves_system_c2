@@ -18,6 +18,7 @@
             P8_39_pinmux { status = "disabled"; }; /* free LCD_DATA6 */
             P9_91_pinmux { status = "disabled"; }; /* LCD_LED */
             P8_40_pinmux { status = "disabled"; }; /* LCD_DATA7 / TP_IRQ */
+            P8_41_pinmux { status = "disabled"; };
             P9_27_pinmux { status = "disabled"; };
             cape-universal { status = "disabled"; };
         };
@@ -42,7 +43,7 @@
             zola_lcd_gpio_pins: pinmux_zola_lcd_gpio_pins {
                 pinctrl-single,pins = <
                     0x0B8 0x07   /* LCD_DATA6 / GPMC_A6 -> GPIO2_12 (TFT_RS) */
-                    0x17C 0x07   /* UART1_RTSN → GPIO0_13 (TFT_RST) */
+                    0x0B0 0x07   /* (TFT_RST) */
                     0x1A8 0x07   /* MCASP0_AXR1 conf_mcasp0_axr1 → GPIO3_20 (LCD_LED)  */
                 >;
             };
@@ -68,8 +69,76 @@
         };
     };
 
-    /* Fragment 3: SPI1 controller and device nodes */
+
+    /*
+     * NOTE:
+     * The AM335x base device tree creates default SPI child nodes
+     * (channel@0 and channel@1) for BOTH McSPI0 and McSPI1.
+     *
+     * These nodes are usually bound to spidev and will automatically
+     * claim chip-selects during boot.
+     *
+     * Since this overlay defines custom SPI devices (ILI9488 LCD and
+     * ADS7846 touch) and uses GPIO-based CS handling, the default
+     * channel@* nodes MUST be disabled to avoid:
+     *
+     *   - "chipselect already in use"
+     *   - spi_device register errors
+     *   - pinmux conflicts
+     *
+     * Disabling these nodes does NOT disable the SPI controller itself;
+     * it only prevents the default placeholder devices from being created.
+     */
+
+    /* -------------------------------------------------
+     * Disable spidev channels ONLY
+     * (Do NOT disable spi@0 controller nodes)
+     * ------------------------------------------------- */
+
+    /* ========= SPI1 (McSPI1) ========= */
+    /* Path: segment@100000 / target-module@a0000 / spi@0 */
+
+    /* SPI1 channel@0 */
     fragment@3 {
+	    target-path = "/ocp/interconnect@48000000/segment@100000/target-module@a0000/spi@0/channel@0";
+	    __overlay__ {
+		    status = "disabled";
+	    };
+    };
+
+    /* SPI1 channel@1 */
+    fragment@4 {
+	    target-path = "/ocp/interconnect@48000000/segment@100000/target-module@a0000/spi@0/channel@1";
+	    __overlay__ {
+		    status = "disabled";
+	    };
+    };
+
+
+    /* ========= SPI0 (McSPI0) ========= */
+    /* Path: segment@0 / target-module@30000 / spi@0 */
+
+    /* SPI0 channel@0 */
+    fragment@5 {
+	    target-path = "/ocp/interconnect@48000000/segment@0/target-module@30000/spi@0/channel@0";
+	    __overlay__ {
+		    status = "disabled";
+	    };
+    };
+
+    /* SPI0 channel@1 */
+    fragment@6 {
+	    target-path = "/ocp/interconnect@48000000/segment@0/target-module@30000/spi@0/channel@1";
+	    __overlay__ {
+		    status = "disabled";
+	    };
+    };
+
+
+    /* -------------------------------------------------
+     * Fragment 7: SPI1 + LCD + Touch devices
+     * ------------------------------------------------- */
+    fragment@7 {
         target = <&spi1>;
         __overlay__ {
             status = "okay";
@@ -83,15 +152,12 @@
                 &zola_touch_gpio_pins
             >;
 
-            /delete-node/ channel@0;
-            /delete-node/ channel@1;
-
-            /* -------- LCD -------- */
+            /* -------- LCD : ILI9488 -------- */
             ili9488@0 {
                 compatible = "ilitek,ili9488";
                 reg = <0>;
                 spi-max-frequency = <24000000>;
-                cs-gpios = <&gpio3 18 1>;
+                cs-gpios    = <&gpio3 18 1>;
                 dc-gpios    = <&gpio2 12 0>; /* TFT_RS */
                 reset-gpios = <&gpio0 13 1>; /* TFT_RST */
                 backlight   = <&backlight_zola>;
