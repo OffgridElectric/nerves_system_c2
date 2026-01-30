@@ -159,7 +159,7 @@
                 spi-max-frequency = <24000000>;
                 cs-gpios    = <&gpio3 18 1>;
                 dc-gpios    = <&gpio2 12 0>; /* TFT_RS */
-                reset-gpios = <&gpio0 13 1>; /* TFT_RST */
+                reset-gpios = <&gpio2 10 1>; /* TFT_RST */
                 backlight   = <&backlight_zola>;
 
                 rotation = <270>;
