@@ -53,8 +53,8 @@
 			bb_spi1_pins: pinmux_bb_spi1_pins {
 				pinctrl-single,pins = <
 					0x190 0x13	/* mcasp0_aclkx.spi1_sclk, OUTPUT_PULLUP | MODE3 */
-					0x194 0x33	/* mcasp0_fsx.spi1_d0, INPUT_PULLUP | MODE3 */
-					0x198 0x13	/* mcasp0_axr0.spi1_d1, OUTPUT_PULLUP | MODE3 */
+					0x194 0x33	/* mcasp0_fsx.spi1_d0 (MOSI), OUTPUT_PULLUP | MODE3 */
+					0x198 0x13	/* mcasp0_axr0.spi1_d1 (MISO), INPUT_PULLUP | MODE3 */
 					//0x1A0 0x13	/* mcasp0_ahclkr.spi1_cs0, OUTPUT_PULLUP | MODE3 */
 					// 0x164 0x12	/* eCAP0_in_PWM0_out.spi1_cs1 OUTPUT_PULLUP | MODE2 */
 				>;
@@ -77,7 +77,7 @@
 			 * input. The default is D0 as input and
 			 * D1 as output.
 			 */
-			//ti,pindir-d0-out-d1-in;
+			ti,pindir-d0-out-d1-in;
 
 			channel@0 {
 				#address-cells = <1>;
@@ -88,7 +88,7 @@
 
 				reg = <0>;
 				spi-max-frequency = <16000000>;
-				spi-cpha;
+				//spi-cpha;
 			};
 
 			channel@1 {
