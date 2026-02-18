@@ -17,8 +17,8 @@ defmodule TestC2.LcdBacklight do
       {:ok, ref} ->
         Circuits.GPIO.write(ref, 1)
         {:ok, %{gpio: ref}}
-      {:error, _} = err ->
-        err
+      {:error, reason} ->
+        {:stop, reason}
     end
   end
 end
