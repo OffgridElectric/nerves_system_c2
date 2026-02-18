@@ -37,6 +37,8 @@ defmodule Ili9488.Driver do
     Process.sleep(120)
   end
 
+  # Init sequence (gamma, power, VCOM, etc.) uses register values from ESP32
+  # ILI9488 driver reference. Adjust if colours or brightness need tuning.
   defp init_display(devs) do
   # Soft Reset
   send_command(devs, 0x01)
@@ -49,12 +51,12 @@ defmodule Ili9488.Driver do
   # Display inversion ON
   send_command(devs, 0x21)
 
-  # Positive Gamma
+  # Positive Gamma (0xE0) – 15 bytes. Values from ESP32 ILI9488 reference.
   send_command(devs, 0xE0)
   Enum.each([0x00,0x03,0x09,0x08,0x16,0x0A,0x3F,0x78,0x4C,0x09,0x0A,0x08,0x16,0x1A,0x0F],
     &send_data(devs, <<&1>>))
 
-  # Negative Gamma
+  # Negative Gamma (0xE1) – 15 bytes. Values from ESP32 ILI9488 reference.
   send_command(devs, 0xE1)
   Enum.each([0x00,0x16,0x19,0x03,0x0F,0x05,0x32,0x45,0x46,0x04,0x0E,0x0D,0x35,0x37,0x0F],
     &send_data(devs, <<&1>>))
