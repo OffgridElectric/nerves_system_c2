@@ -40,67 +40,73 @@ defmodule Ili9488.Driver do
   # Init sequence (gamma, power, VCOM, etc.) uses register values from ESP32
   # ILI9488 driver reference. Adjust if colours or brightness need tuning.
   defp init_display(devs) do
-  # Soft Reset
+  # Soft Reset (0x01)
   send_command(devs, 0x01)
   Process.sleep(10)
 
-  # Exit Sleep
+  # Exit Sleep (0x11)
   send_command(devs, 0x11)
   Process.sleep(120)
 
-  # Display inversion ON
+  # Display Inversion ON (0x21) – inverts pixel polarity for correct colours
   send_command(devs, 0x21)
 
-  # Positive Gamma (0xE0) – 15 bytes. Values from ESP32 ILI9488 reference.
+  # --- Positive Gamma Control (0xE0) – 15 bytes, curve for bright levels (ESP32 ref) ---
   send_command(devs, 0xE0)
   Enum.each([0x00,0x03,0x09,0x08,0x16,0x0A,0x3F,0x78,0x4C,0x09,0x0A,0x08,0x16,0x1A,0x0F],
     &send_data(devs, <<&1>>))
 
-  # Negative Gamma (0xE1) – 15 bytes. Values from ESP32 ILI9488 reference.
+  # --- Negative Gamma Control (0xE1) – 15 bytes, curve for dark levels (ESP32 ref) ---
   send_command(devs, 0xE1)
   Enum.each([0x00,0x16,0x19,0x03,0x0F,0x05,0x32,0x45,0x46,0x04,0x0E,0x0D,0x35,0x37,0x0F],
     &send_data(devs, <<&1>>))
 
-  # Power control
+  # --- Power Control 1 (0xC0) – 2 bytes: VRH, VC ---
   send_command(devs, 0xC0)
   Enum.each([0x17,0x15], &send_data(devs, <<&1>>))
 
+  # --- Power Control 2 (0xC1) – 1 byte: BT (step-up factor) ---
   send_command(devs, 0xC1)
   send_data(devs, <<0x41>>)
 
-  # VCOM
+  # --- VCOM Control (0xC5) – 3 bytes: VCOM value for contrast ---
   send_command(devs, 0xC5)
   Enum.each([0x00,0x12,0x80], &send_data(devs, <<&1>>))
 
-  # MADCTL
+  # --- Memory Access Control / MADCTL (0x36) – 0x48 = MX + BGR (orientation + colour order) ---
   send_command(devs, 0x36)
   send_data(devs, <<0x48>>)
 
-  # RGB666 SPI
+  # --- Pixel Format (0x3A) – 0x66 = RGB666, 3 bytes per pixel (18-bit SPI) ---
   send_command(devs, 0x3A)
   send_data(devs, <<0x66>>)
   Process.sleep(10)
 
-  # Interface control
+  # --- Interface Mode Control (0xB0) – 0x00 = SDO not used (3-wire SPI) ---
   send_command(devs, 0xB0)
   send_data(devs, <<0x00>>)
 
+  # --- Frame Rate Control (0xB1) – 0xA0 = nominal frame rate ---
   send_command(devs, 0xB1)
   send_data(devs, <<0xA0>>)
 
+  # --- Display Inversion Control (0xB4) – 0x02 = 2-dot inversion ---
   send_command(devs, 0xB4)
   send_data(devs, <<0x02>>)
 
+  # --- Display Function Control (0xB6) – 3 bytes: scan direction, gate drive ---
   send_command(devs, 0xB6)
   Enum.each([0x02,0x02,0x3B], &send_data(devs, <<&1>>))
 
+  # --- Entry Mode Set (0xB7) – 0xC6 = normal display, low-level input ---
   send_command(devs, 0xB7)
   send_data(devs, <<0xC6>>)
 
+  # --- Adjust Control 3 (0xF7) – 4 bytes: power/colour tweaks (ESP32 ref) ---
   send_command(devs, 0xF7)
   Enum.each([0xA9,0x51,0x2C,0x82], &send_data(devs, <<&1>>))
 
-  # Display ON
+  # --- Display ON (0x29) ---
   send_command(devs, 0x29)
   Process.sleep(25)
 end
