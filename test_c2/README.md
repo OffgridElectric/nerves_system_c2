@@ -23,6 +23,32 @@ To start your Nerves app:
   * Create firmware with `mix firmware`
   * Burn to an SD card with `mix burn`
 
+## Boot behavior
+
+On device boot, the **LCD backlight** (GPIO 116) is set as output and driven high so the display is lit. This is done by `TestC2.LcdBacklight` (`lib/test_c2/lcd_backlight.ex`), started automatically by the application supervisor (targets only, not host).
+
+## ILI9488 TFT modules
+
+Three modules drive the ILI9488 TFT display and a GPIO indicator:
+
+- **Ili9488.Driver** (`lib/test_c2/ili9488_driver.ex`) – SPI/GPIO setup, reset, init, and drawing (fill, rectangles).
+- **Ili9488.GPIOMonitor** (`lib/test_c2/ili9488_gpio_monitor.ex`) – Monitors GPIO 71 and updates the on-screen indicator.
+- **Ili9488.UI** (`lib/test_c2/ili9488_ui.ex`) – Draws the dashboard (blue background, textbox, "GPIO71" label, GPIO indicator).
+
+Full documentation: [docs/ILI9488_MODULES.md](docs/ILI9488_MODULES.md)
+
+### How to run (IEx)
+
+On device (or `iex -S mix` on host):
+
+```elixir
+{:ok, devs} = Ili9488.Driver.start()
+Ili9488.UI.draw_dashboard(devs)
+Ili9488.GPIOMonitor.start(devs)
+```
+
+GPIO 71 is read every 500 ms; the indicator turns green when high and grey when low.
+
 ## Learn more
 
   * Official docs: https://hexdocs.pm/nerves/getting-started.html

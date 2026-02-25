@@ -34,9 +34,8 @@ defmodule TestC2.Application do
   else
     defp target_children() do
       [
-        # Children for all targets except host
-        # Starts a worker by calling: Target.Worker.start_link(arg)
-        # {Target.Worker, arg},
+        # LCD backlight (GPIO 116) on at boot
+        {TestC2.LcdBacklight, []},
       ]
     end
   end
