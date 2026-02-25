@@ -2,3 +2,4 @@
 
 source "$NERVES_DEFCONFIG_DIR/package/extra-dts/Config.in"
 source "$NERVES_DEFCONFIG_DIR/package/bborg-overlays-zola/Config.in"
+source "$NERVES_DEFCONFIG_DIR/package/tools/Config.in"

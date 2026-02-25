@@ -1,0 +1,14 @@
+menu "Framebuffer debug tools"
+
+config BR2_PACKAGE_FBSET
+    bool "fbset (framebuffer settings utility)"
+    help
+      Utility to show and change Linux framebuffer settings.
+
+config BR2_PACKAGE_FBI
+    bool "fbi (framebuffer image viewer)"
+    help
+      Framebuffer image viewer for LCD testing.
+
+endmenu
+
