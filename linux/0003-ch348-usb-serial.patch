@@ -19,10 +19,19 @@ diff --git a/drivers/usb/serial/Kconfig b/drivers/usb/serial/Kconfig
 index 169251ec8353..1e01a3728a90 100644
 --- a/drivers/usb/serial/Kconfig
 +++ b/drivers/usb/serial/Kconfig
-@@ -112,6 +112,15 @@ config USB_SERIAL_CH341
+@@ -112,6 +112,24 @@ config USB_SERIAL_CH341
  	  To compile this driver as a module, choose M here: the
  	  module will be called ch341.
  
++config USB_SERIAL_CH342
++	tristate "USB Winchiphead CH342 Serial Driver"
++	help
++	  Say Y here if you want to use a Winchiphead CH342
++	  USB to serial adapter.
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called ch348.
++
 +config USB_SERIAL_CH348
 +	tristate "USB Winchiphead CH348 Octo Port Serial Driver"
 +	help
@@ -39,10 +48,11 @@ diff --git a/drivers/usb/serial/Makefile b/drivers/usb/serial/Makefile
 index 2d491e434f11..6f2fdf4e4f78 100644
 --- a/drivers/usb/serial/Makefile
 +++ b/drivers/usb/serial/Makefile
-@@ -15,6 +15,7 @@ obj-$(CONFIG_USB_SERIAL_AIRCABLE)		+= aircable.o
+@@ -15,6 +15,8 @@ obj-$(CONFIG_USB_SERIAL_AIRCABLE)		+= aircable.o
  obj-$(CONFIG_USB_SERIAL_ARK3116)		+= ark3116.o
  obj-$(CONFIG_USB_SERIAL_BELKIN)			+= belkin_sa.o
  obj-$(CONFIG_USB_SERIAL_CH341)			+= ch341.o
++obj-$(CONFIG_USB_SERIAL_CH342)			+= ch348.o
 +obj-$(CONFIG_USB_SERIAL_CH348)			+= ch348.o
  obj-$(CONFIG_USB_SERIAL_CP210X)			+= cp210x.o
  obj-$(CONFIG_USB_SERIAL_CYBERJACK)		+= cyberjack.o
@@ -344,8 +354,17 @@ index 000000000000..66488a72adf2
 +{
 +	struct usb_serial_port *port = urb->context;
 +	struct ch348 *ch348 = usb_get_serial_data(port->serial);
++	bool is_ch342 = (le16_to_cpu(port->serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x7523));
 +	unsigned int portnum, usblen, i;
 +	struct ch348_rxbuf *rxb;
++
++	/* CH342 uses generic read processing */
++	if (is_ch342) {
++		usb_serial_generic_process_read_urb(urb);
++		return;
++	}
 +
 +	if (urb->actual_length < 2) {
 +		dev_dbg(&ch348->udev->dev, "Empty rx buffer\n");
@@ -378,8 +397,16 @@ index 000000000000..66488a72adf2
 +
 +static int ch348_prepare_write_buffer(struct usb_serial_port *port, void *dest, size_t size)
 +{
++	bool is_ch342 = (le16_to_cpu(port->serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x7523));
 +	struct ch348_txbuf *rxt = dest;
 +	int count;
++
++	/* CH342 uses generic write buffer preparation */
++	if (is_ch342) {
++		return usb_serial_generic_prepare_write_buffer(port, dest, size);
++	}
 +
 +	count = kfifo_out_locked(&port->write_fifo, rxt->data,
 +				 size - CH348_TX_HDRSIZE, &port->lock);
@@ -394,6 +421,15 @@ index 000000000000..66488a72adf2
 +		       const unsigned char *buf, int count)
 +{
 +	struct ch348 *ch348 = usb_get_serial_data(port->serial);
++	bool is_ch342 = (le16_to_cpu(port->serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x7523));
++
++	/* CH342 uses generic write */
++	if (is_ch342) {
++		return usb_serial_generic_write(tty, port, buf, count);
++	}
++
 +	struct ch348_port *ch348_port = &ch348->ports[port->port_number];
 +	int ret, max_tx_size;
 +
@@ -466,7 +502,16 @@ index 000000000000..66488a72adf2
 +			      struct ktermios *termios_old)
 +{
 +	struct ch348 *ch348 = usb_get_serial_data(port->serial);
++	bool is_ch342 = (le16_to_cpu(port->serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x7523));
 +	struct ktermios *termios = &tty->termios;
++
++	/* CH342 uses generic termios handling */
++	if (is_ch342) {
++		usb_serial_generic_set_termios(tty, port, termios_old);
++		return;
++	}
 +	int ret, portnum = port->port_number;
 +	struct ch348_initbuf *buffer;
 +	speed_t	baudrate;
@@ -552,7 +597,15 @@ index 000000000000..66488a72adf2
 +static int ch348_open(struct tty_struct *tty, struct usb_serial_port *port)
 +{
 +	struct ch348 *ch348 = usb_get_serial_data(port->serial);
++	bool is_ch342 = (le16_to_cpu(port->serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(port->serial->dev->descriptor.idProduct) == 0x7523));
 +	int ret;
++
++	/* CH342 uses generic handling */
++	if (is_ch342) {
++		return usb_serial_generic_open(tty, port);
++	}
 +
 +	if (tty)
 +		ch348_set_termios(tty, port, NULL);
@@ -574,6 +627,15 @@ index 000000000000..66488a72adf2
 +	int status_buffer_size, i, ret;
 +	struct usb_interface *intf;
 +	struct ch348 *ch348;
++	bool is_ch342 = (le16_to_cpu(serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(serial->dev->descriptor.idProduct) == 0x7523));
++
++	/* CH342 is a simpler single-port device, use generic handling */
++	if (is_ch342) {
++		port0 = serial->port[0];
++		return usb_serial_generic_submit_read_urbs(port0, GFP_KERNEL);
++	}
 +
 +	intf = usb_ifnum_to_if(usb_dev, 0);
 +	epstatus = &intf->cur_altsetting->endpoint[2].desc;
@@ -634,6 +696,13 @@ index 000000000000..66488a72adf2
 +static void ch348_release(struct usb_serial *serial)
 +{
 +	struct ch348 *ch348 = usb_get_serial_data(serial);
++	bool is_ch342 = (le16_to_cpu(serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(serial->dev->descriptor.idProduct) == 0x7523));
++
++	/* CH342 doesn't allocate ch348 structure */
++	if (is_ch342)
++		return;
 +
 +	usb_kill_urb(ch348->status_urb);
 +	usb_free_urb(ch348->status_urb);
@@ -669,6 +738,8 @@ index 000000000000..66488a72adf2
 +	struct usb_device *usb_dev = serial->dev;
 +	struct usb_interface *intf;
 +	int ret;
++	bool is_ch342 = (id->idVendor == 0x1a86 &&
++			  (id->idProduct == 0x5524 || id->idProduct == 0x7523));
 +
 +	intf = usb_ifnum_to_if(usb_dev, 0);
 +
@@ -677,6 +748,12 @@ index 000000000000..66488a72adf2
 +	if (ret) {
 +		dev_err(&serial->dev->dev, "Failed to find basic endpoints ret=%d\n", ret);
 +		return ret;
++	}
++
++	/* CH342 may not have the same endpoint structure as CH348 */
++	if (is_ch342) {
++		dev_info(&serial->dev->dev, "Found WCH CH342\n");
++		return 0;
 +	}
 +
 +	epstatus = &intf->cur_altsetting->endpoint[2].desc;
@@ -700,7 +777,16 @@ index 000000000000..66488a72adf2
 +				struct usb_serial_endpoints *epds)
 +{
 +	int i;
++	bool is_ch342 = (le16_to_cpu(serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(serial->dev->descriptor.idProduct) == 0x7523));
 +
++	/* CH342 is a single port device */
++	if (is_ch342) {
++		return 1;
++	}
++
++	/* CH348 is an 8-port device */
 +	for (i = 1; i < CH348_MAXPORT; ++i) {
 +		epds->bulk_out[i] = epds->bulk_out[0];
 +		epds->bulk_in[i] = epds->bulk_in[0];
@@ -715,6 +801,13 @@ index 000000000000..66488a72adf2
 +static int ch348_suspend(struct usb_serial *serial, pm_message_t message)
 +{
 +	struct ch348 *ch348 = usb_get_serial_data(serial);
++	bool is_ch342 = (le16_to_cpu(serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(serial->dev->descriptor.idProduct) == 0x7523));
++
++	/* CH342 doesn't have status_urb */
++	if (is_ch342)
++		return 0;
 +
 +	usb_kill_urb(ch348->status_urb);
 +
@@ -724,7 +817,14 @@ index 000000000000..66488a72adf2
 +static int ch348_resume(struct usb_serial *serial)
 +{
 +	struct ch348 *ch348 = usb_get_serial_data(serial);
++	bool is_ch342 = (le16_to_cpu(serial->dev->descriptor.idVendor) == 0x1a86 &&
++			  (le16_to_cpu(serial->dev->descriptor.idProduct) == 0x5524 ||
++			   le16_to_cpu(serial->dev->descriptor.idProduct) == 0x7523));
 +	int ret;
++
++	/* CH342 uses generic resume */
++	if (is_ch342)
++		return usb_serial_generic_resume(serial);
 +
 +	ret = usb_submit_urb(ch348->status_urb, GFP_KERNEL);
 +	if (ret) {
@@ -742,7 +842,9 @@ index 000000000000..66488a72adf2
 +}
 +
 +static const struct usb_device_id ch348_ids[] = {
-+	{ USB_DEVICE(0x1a86, 0x55d9), },
++	{ USB_DEVICE(0x1a86, 0x55d9), }, /* CH348 */
++	{ USB_DEVICE(0x1a86, 0x5524), }, /* CH342 */
++	{ USB_DEVICE(0x1a86, 0x7523), }, /* CH342 in some modes */
 +	{ /* sentinel */ }
 +};
 +
@@ -778,6 +880,7 @@ index 000000000000..66488a72adf2
 +
 +MODULE_AUTHOR("Corentin Labbe <clabbe@baylibre.com>");
 +MODULE_DESCRIPTION("USB CH348 Octo port serial converter driver");
++MODULE_ALIAS("usbserial:ch342");
 +MODULE_LICENSE("GPL");
 -- 
 2.34.1
